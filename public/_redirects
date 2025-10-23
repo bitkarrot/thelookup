@@ -1,0 +1,8 @@
+# Domain redirects
+https://nostrnips.com/ https://nostrhub.io/ 301
+https://nostrnips.com/* https://nostrhub.io/:splat 301
+https://nostrproto.com/ https://nostrhub.io/ 301
+https://nostrproto.com/* https://nostrhub.io/:splat 301
+
+# SPA fallback
+https://nostrhub.io/* /index.html 200

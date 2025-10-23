@@ -1,0 +1,529 @@
+/* Custom syntax highlighting that adapts to our theme */
+
+/* Base syntax highlighter styles - remove any default shadows and improve performance */
+.syntax-highlighter {
+  /* Ensure no text shadows that could cause the white shadow effect */
+  text-shadow: none !important;
+  /* Improve text selection performance */
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  /* Optimize rendering */
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+.syntax-highlighter code {
+  /* Remove any inherited text shadows */
+  text-shadow: none !important;
+  /* Ensure proper font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Improve selection performance */
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Override Prism.js default styles to match our theme */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+  text-shadow: none !important;
+}
+
+.token.punctuation {
+  color: hsl(var(--foreground));
+  text-shadow: none !important;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: hsl(var(--primary));
+  text-shadow: none !important;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: hsl(var(--accent));
+  text-shadow: none !important;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: hsl(var(--foreground));
+  text-shadow: none !important;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: hsl(280 100% 70%);
+  text-shadow: none !important;
+}
+
+.token.function,
+.token.class-name {
+  color: hsl(var(--primary));
+  font-weight: 600;
+  text-shadow: none !important;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: hsl(var(--accent));
+  text-shadow: none !important;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+  text-shadow: none !important;
+}
+
+.token.italic {
+  font-style: italic;
+  text-shadow: none !important;
+}
+
+.token.entity {
+  cursor: help;
+  text-shadow: none !important;
+}
+
+/* Dark theme overrides */
+.dark .token.comment,
+.dark .token.prolog,
+.dark .token.doctype,
+.dark .token.cdata {
+  color: hsl(var(--muted-foreground));
+  text-shadow: none !important;
+}
+
+.dark .token.property,
+.dark .token.tag,
+.dark .token.boolean,
+.dark .token.number,
+.dark .token.constant,
+.dark .token.symbol,
+.dark .token.deleted {
+  color: hsl(var(--primary));
+  text-shadow: none !important;
+}
+
+.dark .token.selector,
+.dark .token.attr-name,
+.dark .token.string,
+.dark .token.char,
+.dark .token.builtin,
+.dark .token.inserted {
+  color: hsl(var(--accent));
+  text-shadow: none !important;
+}
+
+/* Enhanced dark theme colors for better contrast */
+.dark .token.atrule,
+.dark .token.attr-value,
+.dark .token.keyword {
+  color: hsl(280 100% 80%);
+  text-shadow: none !important;
+}
+
+.dark .token.function,
+.dark .token.class-name {
+  color: hsl(var(--primary));
+  font-weight: 600;
+  text-shadow: none !important;
+}
+
+.dark .token.operator,
+.dark .token.entity,
+.dark .token.url {
+  color: hsl(var(--foreground));
+  text-shadow: none !important;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light theme - clean and modern */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 263 70% 50%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 207 97% 43%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 263 70% 50%;
+
+    --radius: 0.75rem;
+
+    /* Gradient colors for light theme */
+    --gradient-from: 263 70% 50%;
+    --gradient-via: 280 100% 70%;
+    --gradient-to: 180 100% 50%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.9% 10%;
+    --sidebar-primary: 263 70% 50%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 240 5.9% 90%;
+    --sidebar-ring: 263 70% 50%;
+  }
+
+  .dark {
+    /* Enhanced dark mode with more vibrant colors */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 263 70% 50%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 180 100% 50%;
+    --accent-foreground: 240 10% 3.9%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 263 70% 50%;
+
+    --sidebar-background: 240 10% 3.9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 263 70% 50%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 263 70% 50%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    overflow-x: hidden;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    background-attachment: fixed;
+    overflow-x: hidden;
+    min-width: 320px; /* Minimum mobile width */
+  }
+
+  /* Light theme background */
+  body:not(.dark) {
+    background-image:
+      radial-gradient(at 40% 20%, hsl(var(--gradient-from) / 0.1) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsl(var(--gradient-via) / 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsl(var(--gradient-to) / 0.1) 0px, transparent 50%);
+  }
+
+  /* Dark theme background */
+  .dark body {
+    background-image:
+      radial-gradient(at 40% 20%, hsl(var(--gradient-from)) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsl(var(--gradient-via)) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsl(var(--gradient-to)) 0px, transparent 50%);
+  }
+
+  /* Prevent horizontal scroll on mobile */
+  .container {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  /* Futuristic gradient text */
+  .gradient-text {
+    background-image: linear-gradient(to right, rgb(196 181 253), rgb(236 72 153));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* Neon glow effect */
+  .neon-glow {
+    box-shadow:
+      0 0 5px hsl(var(--primary)),
+      0 0 10px hsl(var(--primary)),
+      0 0 15px hsl(var(--primary)),
+      0 0 20px hsl(var(--primary));
+  }
+
+  /* Glassmorphism effect */
+  .glass {
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Animated gradient border */
+  .gradient-border {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)));
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: xor;
+  }
+
+  /* Floating animation */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Pulse animation for buttons */
+  .pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(var(--primary)), 0 0 10px hsl(var(--primary));
+    }
+    50% {
+      box-shadow: 0 0 10px hsl(var(--primary)), 0 0 20px hsl(var(--primary)), 0 0 30px hsl(var(--primary));
+    }
+  }
+
+  /* Cyber grid background */
+  .cyber-grid {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Holographic effect */
+  .holographic {
+    background: linear-gradient(45deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--accent)) 25%,
+      hsl(var(--primary)) 50%,
+      hsl(var(--accent)) 75%,
+      hsl(var(--primary)) 100%);
+    background-size: 400% 400%;
+    animation: holographic 4s ease-in-out infinite;
+  }
+
+  @keyframes holographic {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Mobile responsive improvements */
+  @media (max-width: 768px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* Ensure cards don't overflow on mobile */
+    .card-content {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    /* Improve button spacing on mobile */
+    .mobile-button-stack {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .mobile-button-stack > * {
+      width: 100%;
+    }
+
+    /* Improve text readability on mobile */
+    h1, h2, h3, h4, h5, h6 {
+      line-height: 1.2;
+      word-wrap: break-word;
+    }
+
+    /* Ensure proper spacing for mobile navigation */
+    .mobile-nav-spacing {
+      gap: 0.5rem;
+    }
+
+    /* Prevent horizontal scroll on very small screens */
+    .mobile-safe {
+      max-width: calc(100vw - 2rem);
+      overflow-x: auto;
+    }
+  }
+
+  /* Custom code block styling to match our theme */
+  .prose pre {
+    border: 1px solid hsl(var(--primary) / 0.2) !important;
+    border-radius: calc(var(--radius) - 2px) !important;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  .prose pre code {
+    white-space: pre;
+    word-wrap: normal;
+  }
+
+  /* Ensure highlight.js code blocks have proper styling */
+  .hljs {
+    padding: 1rem !important;
+    border-radius: calc(var(--radius) - 2px) !important;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    overflow-x: auto !important;
+  }
+
+  /* Line numbers support for syntax highlighter */
+  .line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+  }
+
+  .line-numbers > code {
+    position: relative;
+    white-space: inherit;
+  }
+
+  .line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: -3.8em;
+    width: 3em;
+    letter-spacing: -1px;
+    border-right: 1px solid hsl(var(--border));
+    user-select: none;
+    counter-reset: linenumber;
+  }
+
+  .line-numbers-rows > span {
+    display: block;
+    counter-increment: linenumber;
+  }
+
+  .line-numbers-rows > span:before {
+    content: counter(linenumber);
+    color: hsl(var(--muted-foreground));
+    display: block;
+    padding-right: 0.8em;
+    text-align: right;
+    font-size: 0.75rem;
+    line-height: inherit;
+  }
+
+  /* Improve code selection experience */
+  .syntax-highlighter pre {
+    /* Better scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted));
+  }
+
+  .syntax-highlighter pre::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+
+  .syntax-highlighter pre::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+  }
+
+  .syntax-highlighter pre::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground));
+    border-radius: 4px;
+  }
+
+  .syntax-highlighter pre::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--foreground));
+  }
+
+  /* Ensure proper text selection styling */
+  .syntax-highlighter ::selection {
+    background: hsl(var(--primary) / 0.3);
+    color: inherit;
+  }
+
+  .syntax-highlighter ::-moz-selection {
+    background: hsl(var(--primary) / 0.3);
+    color: inherit;
+  }
+}
