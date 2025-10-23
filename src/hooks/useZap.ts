@@ -51,15 +51,40 @@ export function useZap() {
       const amountMsats = amount * 1000;
 
       // Create zap request using nip57
-      const zapRequestParams = {
-        profile: recipientPubkey,
-        amount: amountMsats,
-        comment,
-        relays,
-        event: eventId || null,
-      };
+      let zapRequestEvent: ReturnType<typeof nip57.makeZapRequest>;
 
-      const zapRequestEvent = nip57.makeZapRequest(zapRequestParams);
+      if (eventId) {
+        // Create a minimal Event object that satisfies the nip57 interface
+        const event = {
+          id: eventId,
+          kind: 1, // Default to text note kind
+          pubkey: recipientPubkey,
+          tags: [],
+          content: '',
+          created_at: Math.floor(Date.now() / 1000),
+          sig: '', // Empty signature since we just need the structure
+        };
+
+        const zapRequestParams = {
+          profile: recipientPubkey,
+          amount: amountMsats,
+          comment,
+          relays,
+          event,
+        };
+
+        zapRequestEvent = nip57.makeZapRequest(zapRequestParams);
+      } else {
+        // For profile zaps, create a profile zap request
+        const zapRequestParams = {
+          profile: recipientPubkey,
+          amount: amountMsats,
+          comment,
+          relays,
+        };
+
+        zapRequestEvent = nip57.makeZapRequest(zapRequestParams as unknown as Parameters<typeof nip57.makeZapRequest>[0]);
+      }
 
       // Handle addressable events (eventCoordinate) manually since nip57 expects event object
       if (eventCoordinate) {
