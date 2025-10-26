@@ -2,15 +2,17 @@ import { useSeoMeta } from '@unhead/react';
 import { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { RepositoryCard } from '@/components/RepositoryCard';
+import { RepositoryListItem } from '@/components/RepositoryListItem';
 import { RepositoryCardSkeleton } from '@/components/RepositoryCardSkeleton';
 import { RelaySelector } from '@/components/RelaySelector';
 import { useRepositories } from '@/hooks/useRepositories';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 import { parseRepositoryEvent, getRepositoryDisplayName } from '@/lib/repository';
-import { Search, GitBranch, Plus } from 'lucide-react';
+import { Search, GitBranch, Plus, Grid, List } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Link } from 'react-router-dom';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
@@ -23,6 +25,7 @@ export default function RepositoriesPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('list');
   
   const { data: repositories, isLoading, error } = useRepositories();
   const { user } = useCurrentUser();
@@ -70,7 +73,8 @@ export default function RepositoriesPage() {
                 Discover and collaborate on git repositories shared via Nostr (NIP-34)
               </p>
             </div>
-            
+
+  
             {user && (
               <Button asChild className="self-start sm:self-auto">
                 <Link to="/repositories/create">
@@ -120,22 +124,58 @@ export default function RepositoriesPage() {
             )}
           </div>
 
-          {/* Results count */}
-          {!isLoading && repositories && (
-            <div className="text-sm text-muted-foreground">
-              {filteredRepos.length} of {repositories.length} repositories
-              {searchQuery && ` matching "${searchQuery}"`}
-              {selectedTag && ` tagged with "${selectedTag}"`}
-            </div>
-          )}
+          {/* Results count and view toggle */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {!isLoading && repositories && (
+              <div className="text-sm text-muted-foreground">
+                {filteredRepos.length} of {repositories.length} repositories
+                {searchQuery && ` matching "${searchQuery}"`}
+                {selectedTag && ` tagged with "${selectedTag}"`}
+              </div>
+            )}
+
+            {/* View Mode Toggle */}
+            <ToggleGroup
+              type="single"
+              value={viewMode}
+              onValueChange={(value) => value && setViewMode(value as 'cards' | 'list')}
+              size="sm"
+              variant="outline"
+            >
+              <ToggleGroupItem value="list" aria-label="List view">
+                <List className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="cards" aria-label="Card view">
+                <Grid className="h-4 w-4" />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
         </div>
 
-        {/* Repository Grid */}
+        {/* Repository Display */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <RepositoryCardSkeleton key={i} className="sm:rounded-lg rounded-none" />
-            ))}
+          <div className={viewMode === 'cards'
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6"
+            : "mt-6"
+          }>
+            {viewMode === 'cards'
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <RepositoryCardSkeleton key={i} className="sm:rounded-lg rounded-none" />
+                ))
+              : Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="p-4 border-b">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 bg-muted rounded-full animate-pulse" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-muted rounded animate-pulse w-1/3" />
+                        <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
+                      </div>
+                      <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+                      <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+                    </div>
+                  </div>
+                ))
+            }
           </div>
         ) : error ? (
           <div className="mt-6">
@@ -161,7 +201,7 @@ export default function RepositoriesPage() {
                       {repositories?.length === 0 ? 'No repositories found' : 'No matching repositories'}
                     </h3>
                     <p className="text-muted-foreground">
-                      {repositories?.length === 0 
+                      {repositories?.length === 0
                         ? 'No git repositories have been announced on this relay yet.'
                         : 'Try adjusting your search or filters to find repositories.'
                       }
@@ -180,10 +220,17 @@ export default function RepositoriesPage() {
             </Card>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6">
-            {filteredRepos.map(({ event }) => (
-              <RepositoryCard key={event.id} event={event} className="sm:rounded-lg rounded-none" />
-            ))}
+          <div className={viewMode === 'cards'
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6"
+            : "mt-6"
+          }>
+            {filteredRepos.map(({ event }) =>
+              viewMode === 'cards' ? (
+                <RepositoryCard key={event.id} event={event} className="sm:rounded-lg rounded-none" />
+              ) : (
+                <RepositoryListItem key={event.id} event={event} />
+              )
+            )}
           </div>
         )}
       </div>

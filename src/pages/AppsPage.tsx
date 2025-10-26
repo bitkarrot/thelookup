@@ -34,7 +34,7 @@ export default function AppsPage() {
   const { data: apps, isLoading, error } = useApps();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedKind, setSelectedKind] = useState<number | null>(null);
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('list');
 
   // Filter apps based on search term and selected kind
   const filteredApps = apps?.filter(app => {
@@ -200,11 +200,11 @@ export default function AppsPage() {
                     variant="outline"
                     size="sm"
                   >
-                    <ToggleGroupItem value="cards" aria-label="Card view">
-                      <Grid3x3 className="h-4 w-4" />
-                    </ToggleGroupItem>
                     <ToggleGroupItem value="list" aria-label="List view">
                       <List className="h-4 w-4" />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="cards" aria-label="Card view">
+                      <Grid3x3 className="h-4 w-4" />
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
