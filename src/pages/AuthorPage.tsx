@@ -272,6 +272,14 @@ function AuthorView({ pubkey }: { pubkey: string }) {
   const RepositoryActions = ({ event }: { event: NostrEvent }) => {
     if (!isOwnProfile) return null;
 
+    // Generate naddr for the repository
+    const naddr = nip19.naddrEncode({
+      identifier: event.tags.find(tag => tag[0] === 'd')?.[1] || '',
+      pubkey: event.pubkey,
+      kind: 30617,
+      relays: [config.relayUrl],
+    });
+
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -280,6 +288,12 @@ function AuthorView({ pubkey }: { pubkey: string }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link to={`/repositories/${naddr}/edit`}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Link>
+          </DropdownMenuItem>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
