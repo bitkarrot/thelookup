@@ -16,17 +16,12 @@ interface RelayInfo {
 
 // Available relay options
 export const RELAY_OPTIONS: RelayInfo[] = [
-  { url: 'wss://wot.nostr.net', name: 'Nostr.NET' },
-  { url: 'wss://relay.primal.net', name: 'Primal' },
-  { url: 'wss://relay.damus.io', name: 'Damus' },
-  { url: 'wss://relay.nostr.band', name: 'Nostr.Band' },
-  { url: 'wss://ditto.pub/relay', name: 'Ditto' },
-
+  { url: 'wss://relay.nostr.net', name: 'Nostr.NET' },
 ];
 
 // Default application configuration
 const DEFAULT_CONFIG: AppConfig = {
-  relayUrl: 'wss://wot.nostr.net',
+  relayUrl: 'wss://relay.nostr.net',
   theme: 'dark',
 };
 

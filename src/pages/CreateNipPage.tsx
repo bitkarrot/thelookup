@@ -144,6 +144,9 @@ export default function CreateNipPage() {
       // Note: We don't add "p" tags for official NIPs as requested
     }
 
+    console.log('Publishing NIP with tags:', tags);
+    console.log('NIP content:', content.trim());
+
     publishEvent(
       {
         kind: 30817,
@@ -152,6 +155,7 @@ export default function CreateNipPage() {
       },
       {
         onSuccess: (event) => {
+          console.log('NIP published successfully:', event);
           const naddr = nip19.naddrEncode({
             identifier: identifier.trim(),
             pubkey: event.pubkey,
@@ -164,6 +168,7 @@ export default function CreateNipPage() {
           navigate(`/${naddr}`);
         },
         onError: (error) => {
+          console.error('Failed to publish NIP:', error);
           toast({
             title: 'Failed to publish NIP',
             description: error.message,

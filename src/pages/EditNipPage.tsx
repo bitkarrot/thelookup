@@ -5,7 +5,7 @@ import { Layout } from '@/components/Layout';
 import { KindInput } from '@/components/KindInput';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCustomNip } from '@/hooks/useCustomNip';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useUpdateNip } from '@/hooks/useUpdateNip';
 import { useAppConfig } from '@/components/AppProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,7 @@ export default function EditNipPage() {
   const { naddr } = useParams<{ naddr: string }>();
   const { user } = useCurrentUser();
   const { data: event, isLoading, error } = useCustomNip(naddr!);
-  const { mutate: publishEvent, isPending } = useNostrPublish();
+  const { mutate: updateNip, isPending } = useUpdateNip();
   const navigate = useNavigate();
   const { config } = useAppConfig();
 
@@ -165,31 +165,14 @@ export default function EditNipPage() {
       return;
     }
 
-    // Preserve fork markers from the original event
-    const forkTags = event.tags.filter((tag: string[]) => {
-      // Fork of custom NIP: ['a', value, ?, 'fork']
-      if (tag[0] === 'a' && tag.length >= 4 && tag[3] === 'fork') {
-        return true;
-      }
-      // Fork of official NIP: ['i', value, 'fork']
-      if (tag[0] === 'i' && tag.length >= 3 && tag[2] === 'fork') {
-        return true;
-      }
-      return false;
-    });
-
-    const tags = [
-      ['d', identifier.trim()],
-      ['title', title.trim()],
-      ...kinds.map(kind => ['k', kind]),
-      ...forkTags, // Preserve fork markers
-    ];
-
-    publishEvent(
+    
+    updateNip(
       {
-        kind: 30817,
+        identifier: identifier.trim(),
+        title: title.trim(),
         content: content.trim(),
-        tags,
+        kinds,
+        originalEvent: event!, // Use the original event for proper replacement
       },
       {
         onSuccess: (newEvent) => {

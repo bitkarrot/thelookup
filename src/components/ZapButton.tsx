@@ -84,7 +84,7 @@ export function ZapButton({
         size={size}
         className={cn('text-orange-500', className)}
         disabled
-        title="WebLN wallet required for zaps"
+        title="WebLN wallet required for zaps. Install Alby, Zeus, or another WebLN-compatible wallet extension"
       >
         <Zap className="h-4 w-4" />
         {showLabel && size !== 'icon' && <span className="ml-1">Zap</span>}
