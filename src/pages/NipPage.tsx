@@ -1,4 +1,3 @@
-import { CommentsSection } from '@/components/CommentsSection';
 import { DeleteNipDialog } from '@/components/DeleteNipDialog';
 import { EventSourceDialog } from '@/components/EventSourceDialog';
 import { Layout } from '@/components/Layout';
@@ -100,7 +99,7 @@ function OfficialNipView({ nipNumber }: { nipNumber: string }) {
 
   useSeoMeta({
     title: `${title} | NIP-${nipNumber} | NostrHub`,
-    description: `${title} - Official Nostr Implementation Possibility (NIP-${nipNumber}). View the specification and join the discussion on NostrHub.`,
+    description: `${title} - Official Nostr Implementation Possibility (NIP-${nipNumber}). View the specification on NostrHub.`,
   });
 
   if (isLoading) {
@@ -108,9 +107,9 @@ function OfficialNipView({ nipNumber }: { nipNumber: string }) {
       <Layout>
         <div className="space-y-4 px-4 sm:px-0">
           <Button variant="ghost" asChild className="p-0">
-            <Link to="/">
+            <Link to="/nips">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Home</span>
+              <span className="hidden sm:inline">Back to NIPs</span>
               <span className="sm:hidden">Back</span>
             </Link>
           </Button>
@@ -137,9 +136,9 @@ function OfficialNipView({ nipNumber }: { nipNumber: string }) {
       <Layout>
         <div className="space-y-4 px-4 sm:px-0">
           <Button variant="ghost" asChild className="p-0">
-            <Link to="/">
+            <Link to="/nips">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
+              Back to NIPs
             </Link>
           </Button>
           <Alert variant="destructive">
@@ -158,9 +157,9 @@ function OfficialNipView({ nipNumber }: { nipNumber: string }) {
       <div className="space-y-4">
         <div className="flex items-center justify-between px-4 sm:px-0">
           <Button variant="ghost" asChild className="p-0">
-            <Link to="/">
+            <Link to="/nips">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
+              Back to NIPs
             </Link>
           </Button>
           <TooltipProvider>
@@ -216,11 +215,6 @@ function OfficialNipView({ nipNumber }: { nipNumber: string }) {
             <MarkdownRenderer content={data!.content} />
           </CardContent>
         </Card>
-
-        {/* Comments Section */}
-        <CommentsSection
-          root={new URL(`https://github.com/nostr-protocol/nips/blob/master/${nipNumber}.md`)}
-        />
       </div>
     </Layout>
   );
@@ -310,7 +304,7 @@ function CustomNipView({ naddr, user }: { naddr: string; user: User | null }) {
 
   useSeoMeta({
     title: `${title} | Custom NIP | NostrHub`,
-    description: event?.content ? `${event.content.slice(0, 160)}...` : `${title} - A custom Nostr Implementation Possibility. View the specification and join the discussion on NostrHub.`,
+    description: event?.content ? `${event.content.slice(0, 160)}...` : `${title} - A custom Nostr Implementation Possibility. View the specification on NostrHub.`,
   });
 
   const kinds = event?.tags.filter((tag) => tag[0] === 'k').map((tag) => tag[1]) || [];
@@ -324,9 +318,9 @@ function CustomNipView({ naddr, user }: { naddr: string; user: User | null }) {
       <Layout>
         <div className="space-y-4 px-4 sm:px-0">
           <Button variant="ghost" asChild className="p-0">
-            <Link to="/">
+            <Link to="/nips">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
+              Back to NIPs
             </Link>
           </Button>
           <Card className="rounded-none sm:rounded-lg mx-0 sm:mx-0">
@@ -352,9 +346,9 @@ function CustomNipView({ naddr, user }: { naddr: string; user: User | null }) {
       <Layout>
         <div className="space-y-4 px-4 sm:px-0">
           <Button variant="ghost" asChild className="p-0">
-            <Link to="/">
+            <Link to="/nips">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
+              Back to NIPs
             </Link>
           </Button>
           <Alert variant="destructive">
@@ -373,9 +367,9 @@ function CustomNipView({ naddr, user }: { naddr: string; user: User | null }) {
       <div className="space-y-4">
         <div className="flex items-center justify-between px-4 sm:px-0">
           <Button variant="ghost" asChild className="p-0">
-            <Link to="/">
+            <Link to="/nips">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
+              Back to NIPs
             </Link>
           </Button>
           <TooltipProvider>
@@ -533,9 +527,6 @@ function CustomNipView({ naddr, user }: { naddr: string; user: User | null }) {
 
         {/* Zap Section */}
         <ZapCustomNip event={event} />
-
-        {/* Comments Section */}
-        <CommentsSection root={event} />
 
         {isOwner && event && (
           <DeleteNipDialog

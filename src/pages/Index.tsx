@@ -267,9 +267,10 @@ const Index = () => {
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold gradient-text">Custom NIPs</h2>
             </div>
-            <Button asChild size="icon" variant="outline">
+            <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600">
               <Link to="/create">
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 mr-2" />
+                Create NIP
               </Link>
             </Button>
           </div>

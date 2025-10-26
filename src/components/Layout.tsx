@@ -96,7 +96,7 @@ export function Layout({ children }: LayoutProps) {
                           NIPs
                         </Link>
                       </Button>
-                      <Button variant="ghost" asChild className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
+                      <Button variant="ghost" asChild className="justify-start bg-purple-600/10 hover:bg-purple-600/20 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300">
                         <Link to="/create">
                           <Plus className="h-4 w-4 mr-3" />
                           Create NIP
