@@ -13,7 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RelaySelector } from '@/components/RelaySelector';
-import { CommentsSection } from '@/components/CommentsSection';
 import { 
   ExternalLink, 
   Globe, 
@@ -437,16 +436,6 @@ export default function AppDetailPage() {
               </CardContent>
             </Card>
           </div>
-        </div>
-
-        {/* Comments Section */}
-        <div className="mt-8">
-          <CommentsSection 
-            root={app.event}
-            title="App Discussion"
-            emptyStateMessage="No comments yet"
-            emptyStateSubtitle="Share your experience with this app or ask questions!"
-          />
         </div>
       </div>
     </Layout>
