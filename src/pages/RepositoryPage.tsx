@@ -21,12 +21,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import { GitBranch, Globe, Copy, GitPullRequest, AlertCircle, Plus, MessageSquare, Code, BookOpen, ChevronDown, MoreHorizontal, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { GitBranch, Globe, Copy, GitPullRequest, AlertCircle, Plus, Code, BookOpen, ChevronDown, MoreHorizontal, CheckCircle, XCircle, FileText } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/useToast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Link } from 'react-router-dom';
-import { CommentsSection } from '@/components/CommentsSection';
 import { SubmitPatchDialog } from '@/components/SubmitPatchDialog';
 import { GitFileBrowser } from '@/components/GitFileBrowser';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -362,14 +361,7 @@ export default function RepositoryPage() {
                     {rootPatches.length}
                   </Badge>
                 </TabsTrigger>
-                <TabsTrigger
-                  value="discussions"
-                  className="relative h-12 bg-transparent border-0 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground hover:text-foreground rounded-none px-0 font-medium transition-all duration-200 hidden md:flex"
-                >
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Discussions
-                </TabsTrigger>
-              </TabsList>
+                              </TabsList>
 
               {/* Mobile dropdown for additional tabs */}
               <div className="md:hidden">
@@ -387,11 +379,7 @@ export default function RepositoryPage() {
                         {rootPatches.length}
                       </Badge>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab("discussions")}>
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Discussions
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
+                                      </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </div>
@@ -705,17 +693,6 @@ export default function RepositoryPage() {
                 })}
               </div>
             )}
-          </TabsContent>
-
-          {/* Discussions Tab Content */}
-          <TabsContent value="discussions" className="mt-0 py-6 space-y-4">
-            <CommentsSection
-              root={repository}
-              title="Discussions"
-              emptyStateMessage="No discussions yet"
-              emptyStateSubtitle="Start a discussion about this repository!"
-              className="border-none"
-            />
           </TabsContent>
         </Tabs>
       </Card>
