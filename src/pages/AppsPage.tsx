@@ -1,5 +1,5 @@
 import { useSeoMeta } from '@unhead/react';
-import { useState } from 'react';
+import { useState, useMemo, React } from 'react';
 import { Layout } from '@/components/Layout';
 import { useApps } from '@/hooks/useApps';
 import { AppCard } from '@/components/AppCard';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Smartphone, Globe, Zap, Plus, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -35,21 +36,29 @@ export default function AppsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedKind, setSelectedKind] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'cards' | 'list'>('list');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  // Filter apps based on search term and selected kind
+  // Get all unique tags from apps
+  const allTags = useMemo(() => {
+    const tags = apps?.flatMap(app => app.tags || []) || [];
+    return Array.from(new Set(tags)).sort();
+  }, [apps]);
+
+  // Filter apps based on search term, selected kind, and selected tag
   const filteredApps = apps?.filter(app => {
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       app.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.about?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesKind = !selectedKind || app.supportedKinds.includes(selectedKind);
+    const matchesTag = !selectedTag || app.tags?.includes(selectedTag);
 
     if (!app.name || !app.picture || !app.about || !app.website) {
       // If app is missing essential fields, skip it
       return false;
     }
-    
-    return matchesSearch && matchesKind;
+
+    return matchesSearch && matchesKind && matchesTag;
   }) || [];
 
   const totalApps = filteredApps.length;
@@ -111,37 +120,83 @@ export default function AppsPage() {
                 />
               </div>
               
-              {/* Popular Event Types Filter */}
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium">Filter by Event Type</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={selectedKind === null ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedKind(null)}
+              {/* Filters */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Popular Event Types Filter */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Filter by Event Type</h3>
+                  <Select
+                    value={selectedKind?.toString() || "all"}
+                    onValueChange={(value) => setSelectedKind(value === "all" ? null : parseInt(value))}
                   >
-                    All Types
-                  </Button>
-                  {POPULAR_KINDS.map(({ kind, name, icon }) => {
-                    const appCount = filteredApps.filter(app => app.supportedKinds.includes(kind)).length || 0;
-                    if (appCount === 0) return null;
-                    
-                    return (
-                      <Button
-                        key={kind}
-                        variant={selectedKind === kind ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedKind(selectedKind === kind ? null : kind)}
-                        className="space-x-1"
-                      >
-                        <span>{icon}</span>
-                        <span>{name}</span>
-                        <Badge variant="secondary" className="ml-1 text-xs">
-                          {appCount}
-                        </Badge>
-                      </Button>
-                    );
-                  })}
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select event type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">
+                        <div className="flex items-center gap-2">
+                          <span>All Types</span>
+                          <Badge variant="secondary" className="ml-auto text-xs">
+                            {filteredApps.length}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                      {POPULAR_KINDS.map(({ kind, name, icon }) => {
+                        const appCount = filteredApps.filter(app => app.supportedKinds.includes(kind)).length || 0;
+                        if (appCount === 0) return null;
+
+                        return (
+                          <SelectItem key={kind} value={kind.toString()}>
+                            <div className="flex items-center gap-2">
+                              <span>{icon}</span>
+                              <span>{name}</span>
+                              <Badge variant="secondary" className="ml-auto text-xs">
+                                {appCount}
+                              </Badge>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Filter by Tags */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Filter by Tags</h3>
+                  <Select
+                    value={selectedTag || "all"}
+                    onValueChange={(value) => setSelectedTag(value === "all" ? null : value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select tag" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">
+                        <div className="flex items-center gap-2">
+                          <span>All Tags</span>
+                          <Badge variant="secondary" className="ml-auto text-xs">
+                            {filteredApps.length}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                      {allTags.map(tag => {
+                        const appCount = filteredApps.filter(app => app.tags?.includes(tag)).length || 0;
+                        if (appCount === 0) return null;
+
+                        return (
+                          <SelectItem key={tag} value={tag}>
+                            <div className="flex items-center gap-2">
+                              <span>{tag}</span>
+                              <Badge variant="secondary" className="ml-auto text-xs">
+                                {appCount}
+                              </Badge>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardContent>

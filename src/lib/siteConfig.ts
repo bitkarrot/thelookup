@@ -16,6 +16,11 @@ export function getClientTag(): string {
 }
 
 export function getSiteDisplayName(): string {
+  // Check if VITE_SITE_DISPLAY_NAME is set first
+  if (import.meta.env.VITE_SITE_DISPLAY_NAME) {
+    return import.meta.env.VITE_SITE_DISPLAY_NAME;
+  }
+
   const siteName = getSiteName();
   // Convert domain name to display name (e.g., lookup.hivetalk.org -> HiveTalk)
   if (siteName.includes('.')) {
@@ -29,8 +34,7 @@ export function getSiteDisplayName(): string {
 
 export function getSiteFullName(): string {
   const displayName = getSiteDisplayName();
-  // Add "Spec" for some sites to maintain the professional feel
-  return displayName.includes('Lookup') ? `${displayName}` : `${displayName} Hub`;
+  return displayName;
 }
 
 export function getPageTitle(pageTitle: string): string {

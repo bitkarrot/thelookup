@@ -9,7 +9,9 @@ import { useRepositories } from '@/hooks/useRepositories';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { parseRepositoryEvent, getRepositoryDisplayName } from '@/lib/repository';
 import { Search, GitBranch, Plus, Grid, List } from 'lucide-react';
@@ -101,25 +103,39 @@ export default function RepositoriesPage() {
             {allTags.length > 0 && (
               <div className="space-y-2">
                 <div className="text-sm font-medium text-muted-foreground">Filter by tags:</div>
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant={selectedTag === null ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedTag(null)}
-                  >
-                    All
-                  </Button>
-                  {allTags.map(tag => (
-                    <Button
-                      key={tag}
-                      variant={selectedTag === tag ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
-                    >
-                      {tag}
-                    </Button>
-                  ))}
-                </div>
+                <Select
+                  value={selectedTag || "all"}
+                  onValueChange={(value) => setSelectedTag(value === "all" ? null : value)}
+                >
+                  <SelectTrigger className="w-full sm:w-64">
+                    <SelectValue placeholder="Select tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      <div className="flex items-center gap-2">
+                        <span>All Tags</span>
+                        <Badge variant="secondary" className="ml-auto text-xs">
+                          {filteredRepos.length}
+                        </Badge>
+                      </div>
+                    </SelectItem>
+                    {allTags.map(tag => {
+                      const repoCount = filteredRepos.filter(repo => repo.data.tags?.includes(tag)).length || 0;
+                      if (repoCount === 0) return null;
+
+                      return (
+                        <SelectItem key={tag} value={tag}>
+                          <div className="flex items-center gap-2">
+                            <span>{tag}</span>
+                            <Badge variant="secondary" className="ml-auto text-xs">
+                              {repoCount}
+                            </Badge>
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
             )}
           </div>

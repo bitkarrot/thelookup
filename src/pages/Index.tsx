@@ -178,8 +178,9 @@ const Index = () => {
                 opts={{
                   align: 'start',
                   loop: false,
-                  dragFree: true,
-                  containScroll: false,
+                  dragFree: false,
+                  containScroll: 'trimSnaps',
+                  skipSnaps: false,
                 }}
                 setApi={setCarouselApi}
                 className="w-full"

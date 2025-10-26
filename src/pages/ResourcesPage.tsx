@@ -105,7 +105,6 @@ export default function ResourcesPage() {
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Essential tools, services, and gateways to enhance your Nostr experience.
-            Explore the ecosystem with trusted resources for every need.
           </p>
         </div>
 
