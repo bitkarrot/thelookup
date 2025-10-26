@@ -3,6 +3,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 
 import Index from "./pages/Index";
 import NipRedirect from "./pages/NipRedirect";
+import ResourcesPage from "./pages/ResourcesPage";
 import CreateNipPage from "./pages/CreateNipPage";
 import EditNipPage from "./pages/EditNipPage";
 import NotificationsPage from "./pages/NotificationsPage";
@@ -28,6 +29,7 @@ export function AppRouter() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<AppsPage />} />
+        <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/nips" element={<Index />} />
         <Route path="/nip/:id" element={<NipRedirect />} />
         <Route path="/create" element={<CreateNipPage />} />

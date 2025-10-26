@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LoginArea } from "@/components/auth/LoginArea";
 import { Footer } from "@/components/Footer";
-import { Plus, Zap, Menu, Smartphone, GitBranch, Moon, Sun } from "lucide-react";
+import { Plus, Zap, Menu, Smartphone, GitBranch, Moon, Sun, Globe } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import {
   Sheet,
@@ -41,6 +41,12 @@ export function Layout({ children }: LayoutProps) {
           {/* Desktop Navigation */}
           {!isMobile && (
             <nav className="flex items-center space-x-2">
+              <Button variant="ghost" asChild className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
+                <Link to="/resources">
+                  <Globe className="h-4 w-4 mr-2" />
+                  Resources
+                </Link>
+              </Button>
               <Button variant="ghost" asChild className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
                 <Link to="/nips">
                   <Zap className="h-4 w-4 mr-2" />
@@ -91,6 +97,12 @@ export function Layout({ children }: LayoutProps) {
                   <div className="flex flex-col space-y-6 mt-6">
                     {/* Navigation Links */}
                     <nav className="flex flex-col space-y-4">
+                      <Button variant="ghost" asChild className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
+                        <Link to="/resources">
+                          <Globe className="h-4 w-4 mr-3" />
+                          Resources
+                        </Link>
+                      </Button>
                       <Button variant="ghost" asChild className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
                         <Link to="/nips">
                           <Zap className="h-4 w-4 mr-3" />

@@ -101,8 +101,8 @@ const Index = () => {
         {/* Hero Section */}
         <div className="text-center space-y-6 sm:space-y-8">
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold gradient-text mb-4 leading-tight">
-              {getSiteFullName()}
+            <h1 className="text-3xl sm:text-4xl font-bold gradient-text mb-4 leading-tight">
+              Nostr Implementation Possibilities
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
               Discover{' '}
