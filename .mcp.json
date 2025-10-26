@@ -4,6 +4,26 @@
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "xjsr", "@nostrbook/mcp"]
+    },
+   "js-dev": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@soapbox.pub/js-dev-mcp@latest"]
+    },
+    "eslint": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@eslint/mcp@latest"],
+      "env": {}
+    },
+    "context7": {
+      "serverUrl": "https://mcp.context7.com/sse"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
     }
   }
 }
