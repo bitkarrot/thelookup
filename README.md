@@ -25,6 +25,8 @@ A website for viewing official Nostr Implementation Possibilities (NIPs) and pub
 - **Responsive Design**: Works on desktop and mobile devices
 - **Search**: Search through official NIPs by number or title
 - **User Authentication**: Login with Nostr extensions (NIP-07) or other methods
+- **App Directory**: Browse and submit Nostr applications with detailed information
+- **Community Flagging**: Report suspicious apps using NIP-1984 reporting system
 
 ## URL Structure
 
@@ -105,6 +107,47 @@ For development, you can create `.env.local` to override settings locally withou
 VITE_SITE_NAME=localhost:8080
 VITE_SITE_URL=http://localhost:8080
 ```
+
+## App Flagging System
+
+The app directory includes a community-driven content moderation system using NIP-1984 report events:
+
+### Report Categories
+- **fraud** - Fake information
+- **spam** - Unwanted promotional content
+- **scam** - Malicious/deceptive content
+- **duplicate** - Duplicate entries
+- **inappropriate** - Violates community standards
+- **impersonation** - Fake identity/business
+
+### How Flagging Works
+1. **Signed-in users** can flag any app from the app detail page
+2. **Flag reports** are published as kind 1984 events on Nostr
+3. **Flag counts** are displayed prominently on app detail pages
+4. **Severity indicators** show warning levels based on flag count
+5. **One flag per user** prevents duplicate reports from the same person
+
+### Flag Event Structure
+```json
+{
+  "kind": 1984,
+  "pubkey": "flagger_pubkey",
+  "content": "This directory entry appears to be fraudulent - fake business information",
+  "tags": [
+    ["e", "target_event_id", "relay_url"],
+    ["p", "target_author_pubkey"],
+    ["report", "fraud"],
+    ["l", "app-flag", "nostrhub.app.flags"],
+    ["k", "31990"]
+  ]
+}
+```
+
+### Community Guidelines
+- **Only flag apps that violate community standards**
+- **Provide detailed descriptions** for your reports
+- **False reports may result in account suspension**
+- **Flag data is public** and visible to all users
 
 ## Contributing
 
