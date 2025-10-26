@@ -4,6 +4,7 @@ import { nip19 } from 'nostr-tools';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { useSeoMeta } from '@unhead/react';
 import { Layout } from '@/components/Layout';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { useRepository, useRepositoryState, useRepositoryPatches, useRepositoryIssues } from '@/hooks/useRepositories';
 import { useIssueStatus } from '@/hooks/useIssueStatus';
 import { useGitRepository } from '@/hooks/useGitRepository';
@@ -179,8 +180,12 @@ export default function RepositoryPage() {
   const authorName = author.data?.metadata?.name ?? genUserName(repository?.pubkey || '');
 
   useSeoMeta({
-    title: repoData ? `${getRepositoryDisplayName(repoData)} | Repository | NostrHub` : 'Repository | NostrHub',
-    description: repoData?.description ? `${repoData.description} - Git repository by ${authorName} on NostrHub.` : `Git repository by ${authorName} on NostrHub. Browse code, submit patches, and report issues.`,
+    title: repoData ? getPageTitle(`${getRepositoryDisplayName(repoData)} | Repository`) : getPageTitle('Repository'),
+    description: getPageDescription('repository', {
+      repoName: repoData ? getRepositoryDisplayName(repoData) : 'this repository',
+      description: repoData?.description,
+      authorName
+    }),
   });
 
   if (!decoded) {

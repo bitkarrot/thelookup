@@ -13,11 +13,12 @@ import { parseRepositoryEvent, getRepositoryDisplayName } from '@/lib/repository
 import { Search, GitBranch, Plus } from 'lucide-react';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Link } from 'react-router-dom';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 
 export default function RepositoriesPage() {
   useSeoMeta({
-    title: 'Git Repositories | NostrHub',
-    description: 'Discover and collaborate on git repositories shared via Nostr (NIP-34).',
+    title: getPageTitle('Git Repositories'),
+    description: getPageDescription('Discover and collaborate on git repositories shared via Nostr (NIP-34)'),
   });
 
   const [searchQuery, setSearchQuery] = useState('');

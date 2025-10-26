@@ -3,6 +3,7 @@ import { useSeoMeta } from '@unhead/react';
 import { nip19 } from 'nostr-tools';
 import { useState } from 'react';
 import { Layout } from '@/components/Layout';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { useApp } from '@/hooks/useApp';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -59,8 +60,8 @@ export default function AppDetailPage() {
 
   // Set SEO meta
   useSeoMeta({
-    title: app ? `${app.name || 'Nostr App'} | NostrHub` : 'App Details | NostrHub',
-    description: app?.about || 'View details about this Nostr application and its supported event types.',
+    title: app ? getPageTitle(app.name || 'Nostr App') : getPageTitle('App Details'),
+    description: getPageDescription('app', { appName: app?.name || 'this app' }),
   });
   
   if (!nip19Param) {

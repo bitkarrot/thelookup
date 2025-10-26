@@ -20,6 +20,7 @@ import { ArrowLeft, AlertCircle, Save, GitFork, X } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { nip19 } from 'nostr-tools';
 import { slugify } from '@/lib/utils';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 
 export default function CreateNipPage() {
   const { toast } = useToast();
@@ -30,8 +31,8 @@ export default function CreateNipPage() {
   const { config } = useAppConfig();
 
   useSeoMeta({
-    title: 'Create Custom NIP | NostrHub',
-    description: 'Create your own custom Nostr Implementation Possibility (NIP). Define new event kinds, protocols, and specifications for the Nostr ecosystem.',
+    title: getPageTitle('Create Custom NIP'),
+    description: getPageDescription('Create your own custom Nostr Implementation Possibility (NIP). Define new event kinds, protocols, and specifications for the Nostr ecosystem'),
   });
 
   // Get fork parameters from URL

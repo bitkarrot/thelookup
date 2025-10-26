@@ -14,6 +14,7 @@ import {
 import { RelaySelector } from "@/components/RelaySelector";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/components/AppProvider";
+import { getSiteFullName } from "@/lib/siteConfig";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,7 +34,7 @@ export function Layout({ children }: LayoutProps) {
               <div className="absolute inset-0 bg-accent/20 rounded-full blur-xl group-hover:bg-primary/20 transition-colors duration-300"></div>
             </div>
             <div className="flex flex-col">
-              <span className="text-lg sm:text-xl font-bold gradient-text">NostrHub</span>
+              <span className="text-lg sm:text-xl font-bold gradient-text">{getSiteFullName()}</span>
             </div>
           </Link>
           

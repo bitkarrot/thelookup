@@ -14,3 +14,31 @@ export function getSiteUrl(): string {
 export function getClientTag(): string {
   return getSiteName();
 }
+
+export function getSiteDisplayName(): string {
+  const siteName = getSiteName();
+  // Convert domain name to display name (e.g., lookup.hivetalk.org -> HiveTalk)
+  if (siteName.includes('.')) {
+    const parts = siteName.split('.');
+    const mainName = parts[0];
+    // Capitalize and clean up the name
+    return mainName.charAt(0).toUpperCase() + mainName.slice(1).replace(/[-_]/g, ' ');
+  }
+  return siteName.charAt(0).toUpperCase() + siteName.slice(1);
+}
+
+export function getSiteFullName(): string {
+  const displayName = getSiteDisplayName();
+  // Add "Spec" for some sites to maintain the professional feel
+  return displayName.includes('Lookup') ? `${displayName}` : `${displayName} Hub`;
+}
+
+export function getPageTitle(pageTitle: string): string {
+  const siteName = getSiteFullName();
+  return `${pageTitle} | ${siteName}`;
+}
+
+export function getPageDescription(description: string): string {
+  const siteName = getSiteFullName();
+  return description.includes(siteName) ? description : `${description} on ${siteName}.`;
+}

@@ -6,6 +6,7 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { ZapCustomNip } from '@/components/ZapCustomNip';
 import { useSeoMeta } from '@unhead/react';
 import { useAppConfig } from '@/components/AppProvider';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -98,8 +99,8 @@ function OfficialNipView({ nipNumber }: { nipNumber: string }) {
   })() : `NIP-${nipNumber}`;
 
   useSeoMeta({
-    title: `${title} | NIP-${nipNumber} | NostrHub`,
-    description: `${title} - Official Nostr Implementation Possibility (NIP-${nipNumber}). View the specification on NostrHub.`,
+    title: getPageTitle(`${title} | NIP-${nipNumber}`),
+    description: getPageDescription('official-nip', { title, nipNumber }),
   });
 
   if (isLoading) {
@@ -303,8 +304,11 @@ function CustomNipView({ naddr, user }: { naddr: string; user: User | null }) {
   const title = event?.tags.find((tag) => tag[0] === 'title')?.[1] || 'Untitled NIP';
 
   useSeoMeta({
-    title: `${title} | Custom NIP | NostrHub`,
-    description: event?.content ? `${event.content.slice(0, 160)}...` : `${title} - A custom Nostr Implementation Possibility. View the specification on NostrHub.`,
+    title: getPageTitle(`${title} | Custom NIP`),
+    description: getPageDescription('custom-nip', {
+      title,
+      content: event?.content
+    }),
   });
 
   const kinds = event?.tags.filter((tag) => tag[0] === 'k').map((tag) => tag[1]) || [];

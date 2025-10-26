@@ -13,6 +13,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Search, Smartphone, Globe, Zap, Plus, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 
 const POPULAR_KINDS = [
   { kind: 1, name: 'Text Notes', icon: '📝' },
@@ -26,8 +27,8 @@ const POPULAR_KINDS = [
 
 export default function AppsPage() {
   useSeoMeta({
-    title: 'Nostr Apps | NostrHub',
-    description: 'Discover applications that can handle different types of Nostr events. Find the perfect app for your needs.',
+    title: getPageTitle('Nostr Apps'),
+    description: getPageDescription('Discover applications that can handle different types of Nostr events. Find the perfect app for your needs.'),
   });
 
   const { data: apps, isLoading, error } = useApps();

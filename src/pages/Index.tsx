@@ -14,11 +14,12 @@ import { useSeoMeta } from '@unhead/react';
 import { AlertTriangle, BookOpen, Plus, Search, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getPageTitle, getPageDescription, getSiteFullName } from '@/lib/siteConfig';
 
 const Index = () => {
   useSeoMeta({
-    title: 'NostrHub | Discover and Publish NIPs',
-    description: 'Explore official NIPs and publish your own custom NIPs on NostrHub.',
+    title: getPageTitle('Discover and Publish NIPs'),
+    description: getPageDescription('Explore official NIPs and publish your own custom NIPs'),
   });
 
   const navigate = useNavigate();
@@ -101,7 +102,7 @@ const Index = () => {
         <div className="text-center space-y-6 sm:space-y-8">
           <div className="space-y-4">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold gradient-text mb-4 leading-tight">
-              NostrHub
+              {getSiteFullName()}
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
               Discover{' '}

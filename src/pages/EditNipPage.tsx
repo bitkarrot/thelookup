@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useSeoMeta } from '@unhead/react';
 import { Layout } from '@/components/Layout';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { KindInput } from '@/components/KindInput';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCustomNip } from '@/hooks/useCustomNip';
@@ -35,8 +36,8 @@ export default function EditNipPage() {
   const [kinds, setKinds] = useState<string[]>([]);
 
   useSeoMeta({
-    title: title ? `Edit ${title} | NostrHub` : 'Edit Custom NIP | NostrHub',
-    description: 'Edit your custom Nostr Implementation Possibility (NIP). Update the specification, add new event kinds, or modify the content.',
+    title: title ? getPageTitle(`Edit ${title}`) : getPageTitle('Edit Custom NIP'),
+    description: getPageDescription('edit-nip'),
   });
 
   useEffect(() => {

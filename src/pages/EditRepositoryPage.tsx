@@ -2,6 +2,7 @@ import { useParams, Navigate } from 'react-router-dom';
 import { nip19 } from 'nostr-tools';
 import { Layout } from '@/components/Layout';
 import { useSeoMeta } from '@unhead/react';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { EditRepositoryForm } from '@/components/EditRepositoryForm';
 import { useRepository } from '@/hooks/useRepositories';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -37,8 +38,8 @@ export default function EditRepositoryPage() {
   const repoData = repository ? parseRepositoryEvent(repository) : null;
 
   useSeoMeta({
-    title: repoData ? `Edit ${repoData.name || 'Repository'} | NostrHub` : 'Edit Repository | NostrHub',
-    description: 'Edit your git repository information, update description, and modify repository settings.',
+    title: repoData ? getPageTitle(`Edit ${repoData.name || 'Repository'}`) : getPageTitle('Edit Repository'),
+    description: getPageDescription('edit-repository'),
   });
 
   if (!naddr) {

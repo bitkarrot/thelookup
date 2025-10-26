@@ -28,6 +28,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useToast } from '@/hooks/useToast';
+import { getSiteDisplayName } from '@/lib/siteConfig';
 import { useZaps } from '@/hooks/useZaps';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useWallet } from '@/hooks/useWallet';
@@ -277,7 +278,7 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
 
   useEffect(() => {
     if (target) {
-      setComment('Zapped with NostrHub!');
+      setComment(`Zapped with ${getSiteDisplayName()}!`);
     }
   }, [target]);
 

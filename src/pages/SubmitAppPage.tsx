@@ -5,11 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 
 export default function SubmitAppPage() {
   useSeoMeta({
-    title: 'Submit App | NostrHub',
-    description: 'Submit your Nostr application to the directory. Create a Handler Information event to make your app discoverable by users and other clients.',
+    title: getPageTitle('Submit App'),
+    description: getPageDescription('Submit your Nostr application to the directory. Create a Handler Information event to make your app discoverable by users and other clients'),
   });
 
   return (
