@@ -55,6 +55,31 @@ Custom NIPs are published as kind 30817 events with the following structure:
 - **React Markdown** for markdown rendering
 - **Vite** for build tooling
 
+## Environment Variables
+
+The site can be customized by setting environment variables. Copy `.env.example` to `.env` and customize:
+
+```bash
+# Site Configuration
+VITE_SITE_NAME=nostrhub.io      # Site name used for client tags and redirects
+VITE_SITE_URL=https://nostrhub.io  # Full site URL
+```
+
+### Deployment Customization
+
+When deploying your own instance, you can customize:
+
+1. **Site Name**: Changes the client tag in published events and redirect targets
+2. **Site URL**: Used for any absolute URLs that reference the site
+
+Example for a custom deployment:
+
+```bash
+# .env
+VITE_SITE_NAME=my-nostr-site.com
+VITE_SITE_URL=https://my-nostr-site.com
+```
+
 ## Development
 
 ```bash
@@ -69,6 +94,16 @@ npm run build
 
 # Deploy
 npm run deploy
+```
+
+### Development Environment Variables
+
+For development, you can create `.env.local` to override settings locally without affecting the repository:
+
+```bash
+# .env.local (for development only)
+VITE_SITE_NAME=localhost:8080
+VITE_SITE_URL=http://localhost:8080
 ```
 
 ## Contributing

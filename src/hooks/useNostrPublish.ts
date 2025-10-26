@@ -2,6 +2,7 @@ import { useNostr } from "@nostrify/react";
 import { useMutation } from "@tanstack/react-query";
 
 import { useCurrentUser } from "./useCurrentUser";
+import { getClientTag } from "@/lib/siteConfig";
 
 interface EventTemplate {
   kind: number;
@@ -21,7 +22,7 @@ export function useNostrPublish() {
 
         // Add the client tag if it doesn't exist
         if (!tags.some((tag) => tag[0] === "client")) {
-          tags.push(["client", "nostrhub.io"]);
+          tags.push(["client", getClientTag()]);
         }
 
         const event = await user.signer.signEvent({
