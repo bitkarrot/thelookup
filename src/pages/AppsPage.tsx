@@ -4,11 +4,13 @@ import { Layout } from '@/components/Layout';
 import { useApps } from '@/hooks/useApps';
 import { AppCard } from '@/components/AppCard';
 import { AppCardSkeleton } from '@/components/AppCardSkeleton';
+import { AppListItem } from '@/components/AppListItem';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, Smartphone, Globe, Zap, Plus } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Search, Smartphone, Globe, Zap, Plus, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -31,6 +33,7 @@ export default function AppsPage() {
   const { data: apps, isLoading, error } = useApps();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedKind, setSelectedKind] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
 
   // Filter apps based on search term and selected kind
   const filteredApps = apps?.filter(app => {
@@ -169,29 +172,58 @@ export default function AppsPage() {
           </div>
         )}
 
-        {/* Apps Grid */}
+        {/* Apps Display */}
         {!isLoading && !error && (
           <>
             {filteredApps.length > 0 ? (
               <>
-                <div className="flex items-center justify-between mt-6 px-4 sm:px-0">
-                  <h2 className="text-xl font-semibold">
-                    {selectedKind ? (
-                      <>Apps for {POPULAR_KINDS.find(k => k.kind === selectedKind)?.name || `Kind ${selectedKind}`}</>
-                    ) : (
-                      'All Apps'
-                    )}
-                  </h2>
-                  <span className="text-sm text-muted-foreground">
-                    {filteredApps.length} {filteredApps.length === 1 ? 'app' : 'apps'}
-                  </span>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6 px-4 sm:px-0">
+                  <div>
+                    <h2 className="text-xl font-semibold">
+                      {selectedKind ? (
+                        <>Apps for {POPULAR_KINDS.find(k => k.kind === selectedKind)?.name || `Kind ${selectedKind}`}</>
+                      ) : (
+                        'All Apps'
+                      )}
+                    </h2>
+                    <span className="text-sm text-muted-foreground mt-1">
+                      {filteredApps.length} {filteredApps.length === 1 ? 'app' : 'apps'}
+                    </span>
+                  </div>
+
+                  {/* View Mode Toggle */}
+                  <ToggleGroup
+                    type="single"
+                    value={viewMode}
+                    onValueChange={(value) => setViewMode(value as 'cards' | 'list')}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <ToggleGroupItem value="cards" aria-label="Card view">
+                      <Grid3x3 className="h-4 w-4" />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="list" aria-label="List view">
+                      <List className="h-4 w-4" />
+                    </ToggleGroupItem>
+                  </ToggleGroup>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6">
-                  {filteredApps.map((app) => (
-                    <AppCard key={app.id} app={app} className="sm:rounded-lg rounded-none" />
-                  ))}
-                </div>
+
+                {/* Conditional Rendering based on viewMode */}
+                {viewMode === 'cards' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6">
+                    {filteredApps.map((app) => (
+                      <AppCard key={app.id} app={app} className="sm:rounded-lg rounded-none" />
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="sm:rounded-lg rounded-none mt-6">
+                    <div className="divide-y">
+                      {filteredApps.map((app) => (
+                        <AppListItem key={app.id} app={app} />
+                      ))}
+                    </div>
+                  </Card>
+                )}
               </>
             ) : (
               <div className="mt-6">
@@ -202,7 +234,7 @@ export default function AppsPage() {
                         <Globe className="h-12 w-12 text-muted-foreground mx-auto" />
                         <h3 className="text-lg font-medium">No Apps Found</h3>
                         <p className="text-muted-foreground">
-                          {searchTerm || selectedKind 
+                          {searchTerm || selectedKind
                             ? 'No apps match your current filters. Try adjusting your search or filters.'
                             : 'No apps found on this relay. Try switching to a different relay to discover apps.'
                           }
