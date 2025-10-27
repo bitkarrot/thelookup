@@ -70,7 +70,7 @@ export function AppListItem({ app }: AppListItemProps) {
 
             {/* Open App Button */}
             {app.website && (
-              <Button size="sm" asChild>
+              <Button size="sm" asChild className="bg-purple-600 hover:bg-purple-700 text-white">
                 <a
                   href={app.website}
                   target="_blank"
