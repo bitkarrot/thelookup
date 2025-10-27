@@ -196,7 +196,7 @@ const Index = () => {
                           <CardContent className="p-4 flex flex-col justify-between h-full">
                             <div className="flex flex-col justify-between h-full">
                               <div>
-                                <h3 className="font-semibold text-primary group-hover:text-accent transition-colors">
+                                <h3 className="font-semibold text-purple-600 dark:text-purple-400 group-hover:text-accent transition-colors">
                                   NIP-{nip.number}
                                 </h3>
                                 <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors line-clamp-2">
@@ -211,7 +211,7 @@ const Index = () => {
                                       <Badge
                                         key={eventKind.kind}
                                         variant="secondary"
-                                        className="text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer"
+                                        className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-300 dark:border-purple-700 hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors cursor-pointer"
                                         onClick={(e) => {
                                           e.preventDefault();
                                           e.stopPropagation();
