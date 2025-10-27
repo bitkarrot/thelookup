@@ -5,7 +5,7 @@
       "command": "npx",
       "args": ["-y", "xjsr", "@nostrbook/mcp"]
     },
-   "js-dev": {
+    "js-dev": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@soapbox.pub/js-dev-mcp@latest"]
@@ -20,10 +20,21 @@
       "serverUrl": "https://mcp.context7.com/sse"
     },
     "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "shadcn": {
+      "type": "stdio",
       "command": "npx",
       "args": [
-        "@playwright/mcp@latest"
-      ]
+        "-y",
+        "shadcn@canary",
+        "registry:mcp"
+      ],
+      "env": {
+        "REGISTRY_URL": "https://tweakcn.com/r/themes/registry.json"
+      }
     }
   }
 }
