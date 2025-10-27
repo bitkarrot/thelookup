@@ -270,20 +270,20 @@
   }
 
   /* Light theme background */
-  body:not(.dark) {
+  /* body:not(.dark) {
     background-image:
       radial-gradient(at 40% 20%, hsl(var(--gradient-from) / 0.1) 0px, transparent 50%),
       radial-gradient(at 80% 0%, hsl(var(--gradient-via) / 0.1) 0px, transparent 50%),
       radial-gradient(at 0% 50%, hsl(var(--gradient-to) / 0.1) 0px, transparent 50%);
-  }
+  } */
 
   /* Dark theme background */
-  .dark body {
+  /* .dark body {
     background-image:
       radial-gradient(at 40% 20%, hsl(var(--gradient-from)) 0px, transparent 50%),
       radial-gradient(at 80% 0%, hsl(var(--gradient-via)) 0px, transparent 50%),
       radial-gradient(at 0% 50%, hsl(var(--gradient-to)) 0px, transparent 50%);
-  }
+  } */
 
   /* Prevent horizontal scroll on mobile */
   .container {

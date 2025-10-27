@@ -25,8 +25,11 @@ export function Layout({ children }: LayoutProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-background cyber-grid flex flex-col">
-      <header className="glass border-b border-white/10 sticky top-0 z-50">
+    // <div className="min-h-screen bg-background cyber-grid flex flex-col">
+    <div className="min-h-screen flex flex-col">
+
+      {/* <header className="glass border-b border-white/10 sticky top-0 z-50"> */}
+      <header className="border-b border-white/10 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
             <div className="relative">
@@ -170,7 +173,9 @@ export function Layout({ children }: LayoutProps) {
       </header>
       
       <main className="relative flex-1">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
+        {/* <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div> */}
+        <div className="absolute inset-0 from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
+
         <div className="container px-0 sm:px-4 py-4 sm:py-8 relative z-10 min-w-0">
           {children}
         </div>
@@ -179,12 +184,12 @@ export function Layout({ children }: LayoutProps) {
       <Footer />
       
       {/* Floating particles effect */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {/* <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-primary/30 rounded-full float"></div>
         <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-accent/40 rounded-full float" style={{ animationDelay: '2s' }}></div>
         <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-primary/20 rounded-full float" style={{ animationDelay: '4s' }}></div>
         <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-accent/30 rounded-full float" style={{ animationDelay: '1s' }}></div>
-      </div>
+      </div> */}
     </div>
   );
 }

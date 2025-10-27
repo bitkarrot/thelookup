@@ -39,7 +39,7 @@ export function App() {
             <NostrProvider>
               <NWCProvider>
                 <TooltipProvider>
-                <AnimatedBackground />
+                {/* <AnimatedBackground /> */}
                 <Toaster />
                 <Suspense>
                   <AppRouter />
