@@ -165,8 +165,8 @@
 
 @layer base {
   :root {
-    /* Light theme - clean and modern */
-    --background: 0 0% 100%;
+    /* Light theme - inspired by tweakcn template */
+    --background: 210 25% 97%; /* #f8f9fa */
     --foreground: 240 10% 3.9%;
 
     --card: 0 0% 100%;
@@ -175,7 +175,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    --primary: 263 70% 50%;
+    --primary: 316 100% 50%; /* #ff00c8 - bright pink */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 240 4.8% 95.9%;
@@ -184,7 +184,7 @@
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
 
-    --accent: 207 97% 43%;
+    --accent: 174 100% 50%; /* #00ffcc - bright cyan */
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
@@ -197,9 +197,9 @@
     --radius: 0.75rem;
 
     /* Gradient colors for light theme */
-    --gradient-from: 263 70% 50%;
-    --gradient-via: 280 100% 70%;
-    --gradient-to: 180 100% 50%;
+    --gradient-from: 316 100% 50%; /* Pink */
+    --gradient-via: 174 100% 50%; /* Cyan */
+    --gradient-to: 316 100% 50%; /* Pink */
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.9% 10%;
@@ -212,17 +212,17 @@
   }
 
   .dark {
-    /* Enhanced dark mode with more vibrant colors */
-    --background: 240 10% 3.9%;
+    /* Dark theme - inspired by tweakcn template */
+    --background: 240 50% 7%; /* #0c0c1d */
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
+    --card: 240 50% 10%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 240 50% 10%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 263 70% 50%;
+    --primary: 316 100% 50%; /* #ff00c8 - bright pink */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 240 3.7% 15.9%;
@@ -231,7 +231,7 @@
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 180 100% 50%;
+    --accent: 174 100% 50%; /* #00ffcc - bright cyan */
     --accent-foreground: 240 10% 3.9%;
 
     --destructive: 0 84.2% 60.2%;
@@ -253,8 +253,14 @@
 }
 
 @layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
   * {
     border-color: hsl(var(--border));
+  }
+
+  body {
+    font-family: 'Inter', 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   html {
@@ -293,12 +299,47 @@
 }
 
 @layer components {
-  /* Futuristic gradient text */
-  .gradient-text {
-    background-image: linear-gradient(to right, rgb(196 181 253), rgb(236 72 153));
-    background-clip: text;
-    -webkit-background-clip: text;
+  /* Creative title alternatives */
+  .title-accent {
+    position: relative;
+    color: hsl(var(--primary));
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .title-accent::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: hsl(var(--accent));
+    border-radius: 2px;
+    transform: scaleX(0.8);
+  }
+
+  .title-shadow {
+    color: hsl(var(--foreground));
+    text-shadow: 2px 2px 0px hsl(var(--accent) / 0.3),
+                 4px 4px 0px hsl(var(--primary) / 0.2);
+    font-weight: 700;
+  }
+
+  .title-outline {
     color: transparent;
+    -webkit-text-stroke: 2px hsl(var(--primary));
+    text-stroke: 2px hsl(var(--primary));
+    font-weight: 700;
+  }
+
+  .title-duotone {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-stroke: 0.5px hsl(var(--foreground) / 0.1);
+    background-clip: text;
+    color: transparent;
+    font-weight: 600;
   }
 
   /* Neon glow effect */
@@ -361,12 +402,49 @@
     }
   }
 
-  /* Cyber grid background */
-  .cyber-grid {
+  /* Creative background patterns */
+  .pattern-dots {
+    background-image: radial-gradient(circle, hsl(var(--primary) / 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .pattern-diagonal-lines {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      hsl(var(--accent) / 0.05) 10px,
+      hsl(var(--accent) / 0.05) 20px
+    );
+  }
+
+  .pattern-noise {
     background-image:
-      linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
+      radial-gradient(circle at 25% 25%, hsl(var(--primary) / 0.02) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(var(--accent) / 0.02) 0%, transparent 50%);
+    background-size: 50px 50px;
+  }
+
+  .pattern-waves {
+    background-image: repeating-radial-gradient(
+      circle at 0 0,
+      transparent 0,
+      hsl(var(--primary) / 0.03) 10px,
+      transparent 20px,
+      transparent 30px,
+      hsl(var(--accent) / 0.03) 40px,
+      transparent 50px
+    );
+    background-size: 60px 60px;
+  }
+
+  .pattern-circuit {
+    background-image:
+      linear-gradient(hsl(var(--primary) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--accent) / 0.05) 1px, transparent 1px),
+      radial-gradient(circle, hsl(var(--primary) / 0.1) 1px, transparent 1px);
+    background-size: 40px 40px, 40px 40px, 20px 20px;
+    background-position: 0 0, 0 0, 10px 10px;
   }
 
   /* Holographic effect */

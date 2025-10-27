@@ -25,8 +25,7 @@ export function Layout({ children }: LayoutProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    // <div className="min-h-screen bg-background cyber-grid flex flex-col">
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex flex-col">
 
       {/* <header className="glass border-b border-white/10 sticky top-0 z-50"> */}
       <header className="border-b border-white/10 sticky top-0 z-50">
@@ -37,7 +36,7 @@ export function Layout({ children }: LayoutProps) {
               <div className="absolute inset-0 bg-accent/20 rounded-full blur-xl group-hover:bg-primary/20 transition-colors duration-300"></div>
             </div>
             <div className="flex flex-col">
-              <span className="text-lg sm:text-xl font-bold gradient-text">{getSiteFullName()}</span>
+              <span className="text-lg sm:text-xl font-bold title-accent">{getSiteFullName()}</span>
             </div>
           </Link>
           
@@ -95,7 +94,7 @@ export function Layout({ children }: LayoutProps) {
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[280px] sm:w-[400px] glass border-primary/20">
                   <SheetHeader>
-                    <SheetTitle className="gradient-text">Navigation</SheetTitle>
+                    <SheetTitle className="title-accent">Navigation</SheetTitle>
                   </SheetHeader>
                   <div className="flex flex-col space-y-6 mt-6">
                     {/* Navigation Links */}

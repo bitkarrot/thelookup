@@ -75,7 +75,7 @@ export default function AppsPage() {
                 <Smartphone className="h-8 w-8 text-primary" />
                 <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold gradient-text">Nostr Apps</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Nostr Apps</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Discover applications that can handle different types of Nostr events. 

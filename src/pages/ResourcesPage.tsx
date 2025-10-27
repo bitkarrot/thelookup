@@ -99,7 +99,7 @@ export default function ResourcesPage() {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Globe className="h-12 w-12 text-primary" />
-            <h1 className="text-4xl font-bold gradient-text">
+            <h1 className="text-4xl font-bold title-duotone">
               Discover Nostr Resources
             </h1>
           </div>
@@ -113,16 +113,17 @@ export default function ResourcesPage() {
           {resources.map((resource) => (
             <Card
               key={resource.name}
-              className="group hover:shadow-lg transition-all duration-300 border-primary/20 hover:border-primary/40 bg-card/50 backdrop-blur-sm"
+              className="group hover:shadow-lg transition-all duration-300 border-primary/20 hover:border-accent/60 bg-card/50 backdrop-blur-sm cursor-pointer"
+              onClick={() => window.open(resource.url, '_blank', 'noopener,noreferrer')}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-accent/20 group-hover:text-accent transition-colors">
                       {resource.icon}
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                      <CardTitle className="text-lg group-hover:text-accent transition-colors">
                         {resource.name}
                       </CardTitle>
                       <div className="flex items-center gap-2 mt-1">
@@ -142,7 +143,8 @@ export default function ResourcesPage() {
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-2 text-sm text-white hover:text-accent transition-colors font-medium"
                 >
                   Visit Resource
                   <ExternalLink className="h-4 w-4" />
