@@ -9,6 +9,14 @@ export function Footer() {
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-6 text-sm">
             <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors duration-300"
+            >
+              {getSiteFullName()}
+            </a>
+            <a
               href="https://nostrbook.dev/"
               target="_blank"
               rel="noopener noreferrer"

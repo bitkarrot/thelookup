@@ -32,7 +32,11 @@ export function Layout({ children }: LayoutProps) {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
             <div className="relative">
-              <Zap className="h-6 w-6 sm:h-8 sm:w-8 text-accent transition-colors duration-300" />
+              <img 
+                src={theme === 'dark' ? "/light_nostrich.png" : "/nostrich.png"} 
+                alt="Nostrich" 
+                className={`h-6 w-6 sm:h-8 sm:w-8 transition-all duration-300 relative z-10 ${theme === 'light' ? 'brightness-75 contrast-125' : ''}`} 
+              />
               <div className="absolute inset-0 bg-accent/20 rounded-full blur-xl group-hover:bg-primary/20 transition-colors duration-300"></div>
             </div>
             <div className="flex flex-col">
