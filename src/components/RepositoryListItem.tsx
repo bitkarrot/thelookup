@@ -32,7 +32,7 @@ export function RepositoryListItem({ event }: RepositoryListItemProps) {
   });
 
   return (
-    <div className="flex items-center gap-4 p-4 border-b hover:bg-muted/50 transition-colors">
+    <div className="flex items-center gap-4 p-4 bg-background border border-b rounded-lg hover:bg-muted/50 hover:shadow-sm transition-all duration-200 mb-2 last:mb-0">
       {/* Repository Icon */}
       <div className="flex-shrink-0">
         <Avatar className="h-12 w-12">
