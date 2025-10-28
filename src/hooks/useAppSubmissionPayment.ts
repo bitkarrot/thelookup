@@ -89,7 +89,7 @@ export function useAppSubmissionPayment() {
         tags: [
           ['p', lightningProfile.pubkey],
           ['amount', amountMsats.toString()],
-          ['relays', import.meta.env.VITE_RELAY_URL || 'wss://relay.nostr.band'],
+          ['relays', import.meta.env.VITE_RELAY_URL || 'wss://relay.nostr.net'],
         ],
         created_at: Math.floor(Date.now() / 1000),
         pubkey: user.pubkey,
@@ -316,6 +316,109 @@ export function useAppSubmissionPayment() {
     });
   }, []);
 
+  // Debug function to investigate zap receipts across multiple relays
+  const debugZapReceipts = useCallback(async () => {
+    if (!user) return;
+    
+    console.log('🔍 DEBUG: Starting multi-relay zap receipt investigation');
+    
+    const config = getPaymentConfig();
+    if (!config) {
+      console.log('❌ No payment config found');
+      return;
+    }
+    
+    const lightningProfile = await fetchLightningAddressProfile(config.lightningAddress);
+    console.log('⚡ Lightning profile:', lightningProfile);
+    console.log('👤 Your pubkey:', user.pubkey);
+    console.log('🔗 Current relay:', import.meta.env.VITE_RELAY_URL || 'wss://relay.nostr.net');
+    
+    // Test the current relay first
+    console.log('\n📡 Checking current relay for recent zap receipts...');
+    
+    const recentReceipts = await nostr.query([{
+      kinds: [9735],
+      since: Math.floor(Date.now() / 1000) - 3600, // Last hour
+      limit: 100,
+    }]);
+    
+    console.log(`Found ${recentReceipts.length} recent zap receipts on current relay`);
+    
+    if (recentReceipts.length > 0) {
+      console.log('📋 Sample receipts:');
+      recentReceipts.slice(0, 5).forEach((receipt, i) => {
+        const pTag = receipt.tags.find(tag => tag[0] === 'p');
+        const bolt11Tag = receipt.tags.find(tag => tag[0] === 'bolt11');
+        const descriptionTag = receipt.tags.find(tag => tag[0] === 'description');
+        
+        console.log(`  Receipt ${i + 1}:`, {
+          id: receipt.id.substring(0, 16) + '...',
+          author: receipt.pubkey.substring(0, 16) + '...',
+          recipient: pTag?.[1]?.substring(0, 16) + '...',
+          created: new Date(receipt.created_at * 1000).toLocaleString(),
+          has_bolt11: !!bolt11Tag,
+          has_description: !!descriptionTag
+        });
+        
+        // Check if this receipt is for our lightning address
+        if (pTag?.[1] === lightningProfile.pubkey) {
+          console.log(`    🎯 This receipt is for bitkarrot@primal.net!`);
+          
+          if (descriptionTag) {
+            try {
+              const zapRequest = JSON.parse(descriptionTag[1]);
+              const amountTag = zapRequest.tags?.find((tag: string[]) => tag[0] === 'amount');
+              if (amountTag) {
+                const amount = parseInt(amountTag[1]) / 1000;
+                console.log(`    💰 Amount: ${amount} sats`);
+              }
+              console.log(`    👤 Zap request author: ${zapRequest.pubkey?.substring(0, 16)}...`);
+              
+              if (zapRequest.pubkey === user.pubkey) {
+                console.log(`    ✅ This is YOUR payment!`);
+              }
+            } catch {
+              console.log(`    ❌ Failed to parse zap request`);
+            }
+          }
+        }
+      });
+    } else {
+      console.log('❌ No zap receipts found on current relay');
+      console.log('💡 This suggests:');
+      console.log('   1. Zap receipts are published to different relays');
+      console.log('   2. Primal might use their own relays');
+      console.log('   3. The payment service publishes elsewhere');
+    }
+    
+    // Check specifically for receipts to our lightning address
+    console.log('\n🎯 Checking specifically for payments to bitkarrot@primal.net...');
+    const receiptsToTarget = await nostr.query([{
+      kinds: [9735],
+      '#p': [lightningProfile.pubkey],
+      since: Math.floor(Date.now() / 1000) - 21600, // Last 6 hours
+      limit: 50,
+    }]);
+    
+    console.log(`Found ${receiptsToTarget.length} receipts to bitkarrot@primal.net in last 6 hours`);
+    
+    if (receiptsToTarget.length > 0) {
+      receiptsToTarget.forEach((receipt, i) => {
+        console.log(`  Payment ${i + 1} to bitkarrot:`, {
+          id: receipt.id.substring(0, 16) + '...',
+          author: receipt.pubkey.substring(0, 16) + '...',
+          created: new Date(receipt.created_at * 1000).toLocaleString(),
+        });
+      });
+    }
+    
+    console.log('\n🏁 Debug investigation complete');
+    console.log('💡 Next steps:');
+    console.log('   - If no receipts found: Zap receipts are on different relays');
+    console.log('   - If receipts found but not yours: Timing or pubkey issue');
+    console.log('   - If your receipts found: Validation logic issue');
+  }, [user, nostr, getPaymentConfig]);
+
   return {
     // Configuration
     isPaymentRequired: isPaymentRequired(),
@@ -328,6 +431,7 @@ export function useAppSubmissionPayment() {
     createPayment: createPaymentMutation.mutate,
     verifyPayment: verifyPaymentMutation.mutate,
     resetPayment,
+    debugZapReceipts, // Add debug function
     
     // Loading states
     isCreatingPayment: createPaymentMutation.isPending,

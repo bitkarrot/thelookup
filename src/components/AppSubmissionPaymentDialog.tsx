@@ -37,6 +37,7 @@ export function AppSubmissionPaymentDialog({
     createPayment,
     verifyPayment,
     resetPayment,
+    debugZapReceipts,
     isCreatingPayment,
     isVerifyingPayment,
   } = useAppSubmissionPayment();
@@ -290,19 +291,29 @@ export function AppSubmissionPaymentDialog({
                   </p>
                 </div>
 
-                {/* Temporary manual override for testing */}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // Manual override for testing
-                    onPaymentConfirmed();
-                    onOpenChange(false);
-                  }}
-                  className="w-full mt-4"
-                  size="sm"
-                >
-                  Manual Override (Testing Only)
-                </Button>
+                {/* Debug and testing buttons */}
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => debugZapReceipts()}
+                    className="flex-1"
+                    size="sm"
+                  >
+                    🔍 Debug Receipts
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      // Manual override for testing
+                      onPaymentConfirmed();
+                      onOpenChange(false);
+                    }}
+                    className="flex-1"
+                    size="sm"
+                  >
+                    Manual Override
+                  </Button>
+                </div>
               </div>
             </div>
           )}
