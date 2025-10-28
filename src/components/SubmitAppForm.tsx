@@ -13,9 +13,12 @@ import { Separator } from '@/components/ui/separator';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
+import { useAppsByAuthor } from '@/hooks/useAppsByAuthor';
+import { useAppSubmissionPayment } from '@/hooks/useAppSubmissionPayment';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { TagInput } from '@/components/TagInput';
-import { Plus, X, Globe, Smartphone, Monitor, Zap } from 'lucide-react';
+import { AppSubmissionPaymentDialog } from '@/components/AppSubmissionPaymentDialog';
+import { Plus, X, Globe, Smartphone, Monitor, Zap, CreditCard } from 'lucide-react';
 
 
 interface AppFormData {
@@ -49,6 +52,15 @@ export function SubmitAppForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { config } = useAppConfig();
+
+  // Check if user already has apps (to determine if payment is required)
+  const { data: userApps } = useAppsByAuthor(user?.pubkey || '');
+  const hasExistingApps = userApps && userApps.length > 0;
+
+  // Payment functionality
+  const { isPaymentRequired, paymentConfig } = useAppSubmissionPayment();
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<AppFormData | null>(null);
 
   const [customKind, setCustomKind] = useState('');
   const [newWebHandler, setNewWebHandler] = useState({ url: '', type: '' });
@@ -137,25 +149,7 @@ export function SubmitAppForm() {
     setValue('androidHandlers', watchedAndroidHandlers.filter((_, i) => i !== index));
   };
 
-  const onSubmit = (data: AppFormData) => {
-    if (!user) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please log in to submit an app.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (data.supportedKinds.length === 0) {
-      toast({
-        title: 'Validation Error',
-        description: 'Please select at least one supported event kind.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
+  const submitAppToRelay = (data: AppFormData) => {
     // Generate a random d tag
     const dTag = Math.random().toString(36).substring(2, 15);
 
@@ -179,6 +173,11 @@ export function SubmitAppForm() {
       about: data.about || undefined,
       picture: data.picture || undefined,
       website: data.website || undefined,
+    });
+
+    toast({
+      title: 'Publishing App',
+      description: 'Sending your app to the Nostr network...',
     });
 
     publishEvent(
@@ -217,6 +216,54 @@ export function SubmitAppForm() {
         },
       }
     );
+  };
+
+  const onSubmit = (data: AppFormData) => {
+    if (!user) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to submit an app.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (data.supportedKinds.length === 0) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please select at least one supported event kind.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Check if payment is required (new user without existing apps)
+    const needsPayment = isPaymentRequired && !hasExistingApps;
+
+
+    if (needsPayment) {
+      // Store form data and show payment dialog
+      setPendingFormData(data);
+      setShowPaymentDialog(true);
+      toast({
+        title: 'Payment Required',
+        description: `A payment of ${paymentConfig?.feeAmount || 0} sats is required for new app submissions.`,
+      });
+    } else {
+      // Submit directly without payment
+      submitAppToRelay(data);
+    }
+  };
+
+  const handlePaymentConfirmed = () => {
+    if (pendingFormData) {
+      toast({
+        title: 'Payment Confirmed',
+        description: 'Payment verified! Now submitting your app...',
+      });
+      submitAppToRelay(pendingFormData);
+      setPendingFormData(null);
+    }
   };
 
   if (!user) {
@@ -585,14 +632,59 @@ export function SubmitAppForm() {
 
           <Separator />
 
+          {/* Payment Info */}
+          {isPaymentRequired && !hasExistingApps && (
+            <>
+              <Separator />
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3 p-4 border border-orange-200 bg-orange-50/50 dark:border-orange-800 dark:bg-orange-950/20 rounded-lg">
+                  <CreditCard className="h-5 w-5 text-orange-600 dark:text-orange-400 mt-0.5" />
+                  <div className="space-y-2">
+                    <h3 className="font-medium text-orange-900 dark:text-orange-100">
+                      Payment Required for New Submissions
+                    </h3>
+                    <div className="text-sm text-orange-800 dark:text-orange-200 space-y-2">
+                      <p>
+                        To prevent spam and maintain quality, we require a small payment of{' '}
+                        <strong>{paymentConfig?.feeAmount || 0} sats</strong> for your first app submission.
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 ml-4">
+                        <li>This is a one-time fee for new users</li>
+                        <li>You can edit your apps for free after submission</li>
+                        <li>Payment is processed via Bitcoin Lightning Network</li>
+                        <li>Supports NIP-57 zap receipts for verification</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
           {/* Submit Button */}
           <div className="flex justify-end">
             <Button type="submit" disabled={isPending} className="min-w-32">
-              {isPending ? 'Submitting...' : 'Submit App'}
+              {isPending ? 'Submitting...' : (
+                isPaymentRequired && !hasExistingApps ? (
+                  <>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pay & Submit App
+                  </>
+                ) : (
+                  'Submit App'
+                )
+              )}
             </Button>
           </div>
         </form>
       </CardContent>
+
+      {/* Payment Dialog */}
+      <AppSubmissionPaymentDialog
+        open={showPaymentDialog}
+        onOpenChange={setShowPaymentDialog}
+        onPaymentConfirmed={handlePaymentConfirmed}
+      />
     </Card>
   );
 }

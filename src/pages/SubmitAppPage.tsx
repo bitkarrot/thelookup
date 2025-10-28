@@ -45,6 +45,7 @@ export default function SubmitAppPage() {
                     <li>Other clients can redirect users to your app for supported event types</li>
                     <li>You can update your app information anytime by submitting again</li>
                     <li>All information is stored on the Nostr network, not on centralized servers</li>
+                    <li>First-time submissions may require a small Lightning payment to prevent spam</li>
                   </ul>
                 </div>
               </div>
