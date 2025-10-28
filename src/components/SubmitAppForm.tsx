@@ -61,7 +61,7 @@ export function SubmitAppForm() {
   const { isPaymentRequired, paymentConfig } = useAppSubmissionPayment();
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [pendingFormData, setPendingFormData] = useState<AppFormData | null>(null);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [customKind, setCustomKind] = useState('');
   const [newWebHandler, setNewWebHandler] = useState({ url: '', type: '' });
   const [newIosHandler, setNewIosHandler] = useState('');
@@ -150,6 +150,15 @@ export function SubmitAppForm() {
   };
 
   const submitAppToRelay = (data: AppFormData) => {
+    // Prevent duplicate submissions
+    if (isSubmitting) {
+      console.log('Already submitting, ignoring duplicate call');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    console.log('Starting app submission...');
+    
     // Generate a random d tag
     const dTag = Math.random().toString(36).substring(2, 15);
 
@@ -188,6 +197,7 @@ export function SubmitAppForm() {
       },
       {
         onSuccess: (event) => {
+          setIsSubmitting(false);
           toast({
             title: 'App Submitted Successfully!',
             description: 'Your app has been published to the Nostr network.',
@@ -202,12 +212,20 @@ export function SubmitAppForm() {
               identifier: dTag,
               relays: [config.relayUrl],
             });
-            navigate(`/${naddr}`);
+            console.log('Navigating to app:', `/${naddr}`);
+            console.log('Event details:', { dTag, kind: event.kind, pubkey: event.pubkey });
+            
+            // For now, navigate to apps list to avoid black screen
+            // TODO: Fix app detail page rendering issue
+            console.log('App submitted successfully, redirecting to apps list');
+            navigate('/apps');
           } else {
+            console.log('No dTag found, resetting form');
             reset();
           }
         },
         onError: (error) => {
+          setIsSubmitting(false);
           toast({
             title: 'Submission Failed',
             description: error instanceof Error ? error.message : 'Failed to submit app.',
@@ -256,13 +274,16 @@ export function SubmitAppForm() {
   };
 
   const handlePaymentConfirmed = () => {
-    if (pendingFormData) {
+    if (pendingFormData && !isSubmitting) {
+      console.log('Payment confirmed, submitting app...');
       toast({
         title: 'Payment Confirmed',
         description: 'Payment verified! Now submitting your app...',
       });
       submitAppToRelay(pendingFormData);
       setPendingFormData(null);
+    } else if (isSubmitting) {
+      console.log('Already submitting, ignoring payment confirmation');
     }
   };
 
