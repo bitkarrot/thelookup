@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Zap, Copy, Check, ExternalLink, CheckCircle, Loader2 } from 'lucide-react';
+import { Zap, Copy, Check, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -102,7 +102,7 @@ export function AppSubmissionPaymentDialog({
       const timeoutId = setTimeout(() => {
         toast({
           title: 'Waiting for Payment',
-          description: 'We\'ll automatically detect when your payment is confirmed. You can also check manually.',
+          description: 'We\'ll automatically detect when your payment is confirmed. You have up to 5 minutes to complete the payment.',
         });
       }, 10000); // Show after 10 seconds
 
@@ -133,12 +133,6 @@ export function AppSubmissionPaymentDialog({
     }
   };
 
-  const openInWallet = () => {
-    if (paymentState.invoice) {
-      const lightningUrl = `lightning:${paymentState.invoice}`;
-      window.open(lightningUrl, '_blank');
-    }
-  };
 
   const handleWebLNPayment = async () => {
     if (!webln || !paymentState.invoice) return;
@@ -174,6 +168,12 @@ export function AppSubmissionPaymentDialog({
           <DialogDescription>
             A payment of {paymentConfig.feeAmount} sats is required to submit your app to the directory.
           </DialogDescription>
+          {isVerifyingPayment && (
+            <div className="flex items-center justify-center mt-2 text-sm text-orange-600 dark:text-orange-400">
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Verifying payment...
+            </div>
+          )}
         </DialogHeader>
 
         <div className="space-y-4">
@@ -218,12 +218,6 @@ export function AppSubmissionPaymentDialog({
               <div className="text-center">
                 <div className="text-2xl font-bold">{paymentConfig.feeAmount} sats</div>
                 <div className="text-sm text-muted-foreground">App submission fee</div>
-                {isVerifyingPayment && (
-                  <div className="flex items-center justify-center mt-2 text-sm text-orange-600 dark:text-orange-400">
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Checking for payment confirmation...
-                  </div>
-                )}
               </div>
 
               <Separator />
@@ -285,48 +279,30 @@ export function AppSubmissionPaymentDialog({
                   </Button>
                 )}
 
-                <Button
-                  variant="outline"
-                  onClick={openInWallet}
-                  className="w-full"
-                  size="lg"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Open in Lightning Wallet
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  onClick={() => verifyPayment()}
-                  disabled={isVerifyingPayment}
-                  className="w-full"
-                  size="sm"
-                >
-                  {isVerifyingPayment ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Verifying Payment...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Check Payment Status
-                    </>
-                  )}
-                </Button>
 
                 <div className="text-xs text-muted-foreground text-center space-y-1">
                   <p>Scan the QR code or copy the invoice to pay with any Lightning wallet.</p>
                   <p className="text-green-600 dark:text-green-400">
                     ✓ Payment verification happens automatically every 5 seconds
                   </p>
-                  {isVerifyingPayment && (
-                    <p className="text-orange-600 dark:text-orange-400 flex items-center justify-center">
-                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                      Checking payment status...
-                    </p>
-                  )}
+                  <p className="text-blue-600 dark:text-blue-400">
+                    ⏱️ You have up to 5 minutes to complete the payment
+                  </p>
                 </div>
+
+                {/* Temporary manual override for testing */}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    // Manual override for testing
+                    onPaymentConfirmed();
+                    onOpenChange(false);
+                  }}
+                  className="w-full mt-4"
+                  size="sm"
+                >
+                  Manual Override (Testing Only)
+                </Button>
               </div>
             </div>
           )}

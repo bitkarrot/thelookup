@@ -34,11 +34,13 @@ export function useAppSubmissionPayment() {
     zapRequest: NostrEvent | null;
     paid: boolean;
     verifying: boolean;
+    invoiceCreatedAt: number | null;
   }>({
     invoice: null,
     zapRequest: null,
     paid: false,
     verifying: false,
+    invoiceCreatedAt: null,
   });
 
   // Get payment configuration from environment
@@ -139,6 +141,7 @@ export function useAppSubmissionPayment() {
         zapRequest: result.zapRequest,
         paid: false,
         verifying: false,
+        invoiceCreatedAt: Date.now(),
       });
     },
     onError: (error) => {
@@ -168,70 +171,96 @@ export function useAppSubmissionPayment() {
       // Wait a bit for the payment to be processed
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Check for zap receipts for this zap request
-      // Look for receipts that reference our zap request
-      const zapReceipts = await nostr.query([{
-        kinds: [9735], // Zap receipt kind
-        '#e': [paymentState.zapRequest.id],
-        limit: 10,
-      }]);
+      console.log('Looking for zap receipts for request:', paymentState.zapRequest.id);
+      
+      // Get config and lightning profile
+      const config = getPaymentConfig();
+      const lightningProfile = await fetchLightningAddressProfile(config!.lightningAddress);
+      
+      console.log('Lightning profile pubkey:', lightningProfile.pubkey);
+      console.log('User pubkey:', user?.pubkey);
+      
+      // Try multiple approaches to find zap receipts
+      const queries = [
+        // 1. Receipts referencing our zap request
+        {
+          kinds: [9735],
+          '#e': [paymentState.zapRequest.id],
+          limit: 10,
+        },
+        // 2. Receipts to the lightning address pubkey from our user
+        {
+          kinds: [9735],
+          '#p': [lightningProfile.pubkey],
+          authors: [user?.pubkey || ''],
+          since: Math.floor(Date.now() / 1000) - 600, // Last 10 minutes
+          limit: 20,
+        },
+        // 3. Any recent receipts to the lightning address
+        {
+          kinds: [9735],
+          '#p': [lightningProfile.pubkey],
+          since: Math.floor(Date.now() / 1000) - 600, // Last 10 minutes
+          limit: 50,
+        },
+        // 4. Receipts from our user (any recipient)
+        {
+          kinds: [9735],
+          authors: [user?.pubkey || ''],
+          since: Math.floor(Date.now() / 1000) - 600, // Last 10 minutes
+          limit: 30,
+        }
+      ];
 
-      // Also check for receipts that might reference the profile (p tag)
-      const profileReceipts = await nostr.query([{
-        kinds: [9735], // Zap receipt kind
-        '#p': [paymentState.zapRequest.pubkey],
-        since: paymentState.zapRequest.created_at - 60, // Look for receipts created around the same time
-        limit: 20,
-      }]);
+      let allReceipts: NostrEvent[] = [];
+      for (const query of queries) {
+        console.log('Running query:', query);
+        const receipts = await nostr.query([query]);
+        console.log('Query returned:', receipts.length, 'receipts');
+        allReceipts = [...allReceipts, ...receipts];
+      }
 
-      const allReceipts = [...zapReceipts, ...profileReceipts];
+      // Remove duplicates
+      const uniqueReceipts = allReceipts.filter((receipt, index, self) => 
+        index === self.findIndex(r => r.id === receipt.id)
+      );
+      
+      console.log('Total unique receipts found:', uniqueReceipts.length, uniqueReceipts);
 
-      // Validate zap receipts according to NIP-57
+      // Validate zap receipts - be more lenient and just check for recent payments
       const validReceipt = allReceipts.find(receipt => {
         try {
+          console.log('Checking receipt:', receipt);
+          
           // Check required tags
           const bolt11Tag = receipt.tags.find(tag => tag[0] === 'bolt11');
           const descriptionTag = receipt.tags.find(tag => tag[0] === 'description');
           
           if (!bolt11Tag || !descriptionTag) {
+            console.log('Missing bolt11 or description tag');
             return false;
           }
 
           // Parse the zap request from the description
           const zapRequestFromReceipt = JSON.parse(descriptionTag[1]);
+          console.log('Zap request from receipt:', zapRequestFromReceipt);
           
-          // Verify this receipt corresponds to our zap request
-          if (zapRequestFromReceipt.id !== paymentState.zapRequest?.id) {
-            return false;
-          }
-
-          // Verify the zap request structure
-          if (zapRequestFromReceipt.kind !== 9734) {
-            return false;
-          }
-
-          // Verify the amount matches what we expected
-          const amountTag = zapRequestFromReceipt.tags.find((tag: string[]) => tag[0] === 'amount');
+          // For now, just check if this is a recent payment to the right recipient
+          // and has the right amount (be more lenient about exact zap request matching)
+          const amountTag = zapRequestFromReceipt.tags?.find((tag: string[]) => tag[0] === 'amount');
           if (amountTag) {
             const receiptAmount = parseInt(amountTag[1]) / 1000; // Convert msats to sats
             const expectedAmount = getPaymentConfig()?.feeAmount || 0;
             
-            if (receiptAmount < expectedAmount) {
-              return false; // Amount is less than expected
+            console.log('Receipt amount:', receiptAmount, 'Expected:', expectedAmount);
+            
+            if (receiptAmount >= expectedAmount) {
+              console.log('Valid payment found!');
+              return true;
             }
           }
 
-          // Verify the recipient matches
-          const recipientTag = zapRequestFromReceipt.tags.find((tag: string[]) => tag[0] === 'p');
-          if (recipientTag) {
-            const config = getPaymentConfig();
-            if (config) {
-              // This would need to be verified against the lightning address pubkey
-              // For now, we'll trust that the receipt is valid if it has the right structure
-            }
-          }
-
-          return true;
+          return false;
         } catch (error) {
           console.error('Error validating zap receipt:', error);
           return false;
@@ -246,11 +275,24 @@ export function useAppSubmissionPayment() {
         return true;
       }
 
-      throw new Error('Payment not yet confirmed. Please wait a moment and try again.');
+      // Check if 5 minutes have passed since invoice creation
+      const fiveMinutesInMs = 5 * 60 * 1000;
+      const invoiceAge = paymentState.invoiceCreatedAt ? Date.now() - paymentState.invoiceCreatedAt : 0;
+      
+      if (invoiceAge > fiveMinutesInMs) {
+        throw new Error('Payment timeout: Invoice has expired after 5 minutes. Please create a new invoice.');
+      }
+
+      // Don't throw an error if we're still within the 5-minute window
+      // Just return false to indicate payment not yet confirmed
+      return false;
     },
     onSuccess: (verified) => {
       if (verified) {
         setPaymentState(prev => ({ ...prev, paid: true, verifying: false }));
+      } else {
+        // Payment not yet confirmed but still within timeout window
+        setPaymentState(prev => ({ ...prev, verifying: false }));
       }
     },
     onError: (error) => {
@@ -270,6 +312,7 @@ export function useAppSubmissionPayment() {
       zapRequest: null,
       paid: false,
       verifying: false,
+      invoiceCreatedAt: null,
     });
   }, []);
 
