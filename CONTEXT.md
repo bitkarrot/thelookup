@@ -1,6 +1,6 @@
 # Project Overview
 
-This project is **NostrHub** - a comprehensive Nostr client application that serves as a hub for discovering and managing Nostr Implementation Possibilities (NIPs) and related content. Built with React 18.x, TailwindCSS 3.x, Vite, shadcn/ui, and Nostrify.
+This project is **The Lookup** - a comprehensive Nostr discovery platform that serves as a hub for exploring Nostr apps, tools, repositories, resources, and implementation possibilities. Originally forked from NostrHub, it has evolved into a focused discovery platform with enhanced features including app submissions, repository management, issue tracking, and lightning payments. Built with React 18.x, TailwindCSS 3.x, Vite, shadcn/ui, and Nostrify.
 
 ## Technology Stack
 
@@ -94,39 +94,61 @@ These components follow a consistent pattern using React's `forwardRef` and use 
 
 ## App Features
 
-NostrHub offers the following key features:
+The Lookup offers the following key features:
 
-### 1. **Official NIPs Browser**
+### 1. **Nostr Apps Directory**
+- Comprehensive app discovery with dual view modes (cards/list)
+- Advanced submission flow with planned lightning payment integration
+- App flagging system for content moderation
+- **Files**: `src/pages/AppsPage.tsx`, `src/pages/SubmitAppPage.tsx`, `src/pages/EditAppPage.tsx`, `src/components/AppCard.tsx`, `src/components/AppListItem.tsx`, `src/hooks/useApps.ts`
+
+### 2. **Git Repositories Hub (NIP-34)**
+- Enhanced repository management with full edit functionality
+- README display and comprehensive metadata handling
+- Background styling and improved UX
+- **Files**: `src/pages/RepositoriesPage.tsx`, `src/pages/AnnounceRepositoryPage.tsx`, `src/pages/EditRepositoryPage.tsx`, `src/components/RepositoryCard.tsx`
+
+### 3. **Issue Tracking System**
+- Create and track issues for Nostr projects
+- Patch and pull request management with full workflow
+- **Files**: `src/pages/IssuePage.tsx`, `src/pages/CreateIssuePage.tsx`, `src/pages/PatchPage.tsx`
+
+### 4. **Official NIPs Browser**
 - Browse/search official NIPs with carousel display and markdown rendering
+- Enhanced with lightning support for NIP authors
 - **Files**: `src/pages/Index.tsx`, `src/hooks/useOfficialNips.ts`, `src/components/OfficialNipCard.tsx`
 
-### 2. **Custom NIPs Platform** 
+### 5. **Custom NIPs Platform**
 - Create/edit custom NIPs (kind 30817), comments, reactions, and community discovery
 - **Files**: `src/pages/CreateNipPage.tsx`, `src/pages/EditNipPage.tsx`, `src/components/CustomNipCard.tsx`, `src/hooks/useCustomNip.ts`
 
-### 3. **Nostr Apps Directory**
-- Discover/submit apps by supported event kinds with search and filtering
-- **Files**: `src/pages/AppsPage.tsx`, `src/pages/SubmitAppPage.tsx`, `src/components/AppCard.tsx`, `src/hooks/useApps.ts`
+### 6. **Resources Page**
+- Curated collection of Nostr tools, resources, and services
+- **Files**: `src/pages/ResourcesPage.tsx`
 
-### 4. **Git Repositories Hub (NIP-34)**
-- Announce/discover git repositories with metadata and tag filtering
-- **Files**: `src/pages/RepositoriesPage.tsx`, `src/pages/AnnounceRepositoryPage.tsx`, `src/components/RepositoryCard.tsx`
+### 7. **Developer Tools**
+- Event kind explorer, NIP-19 decoder, event viewer with JSON inspection
+- DVM (Decentralized Virtual Machines) browsing
+- **Files**: `src/pages/KindPage.tsx`, `src/pages/Nip19Page.tsx`, `src/components/EventViewer.tsx`, `src/pages/EventPage.tsx`, `src/pages/DVMPage.tsx`
 
-### 5. **Notifications System**
+### 8. **Lightning Payment Integration**
+- Comprehensive NIP-57 zap support with WebLN and NWC
+- QR code generation and payment processing
+- Planned integration for app submission payments
+- **Files**: `src/hooks/useZap.ts`, `src/hooks/useZapReceipts.ts`, `src/components/ZapDialog.tsx`, `src/components/ZapCustomNip.tsx`, `src/hooks/useWebLN.ts`, `src/hooks/useNWC.ts`
+
+### 9. **Notifications System**
 - Real-time notifications for content interactions with read state management
 - **Files**: `src/pages/NotificationsPage.tsx`, `src/components/NotificationItem.tsx`, `src/hooks/useNotifications.ts`
 
-### 6. **User Authentication & Profiles**
+### 10. **User Authentication & Profiles**
 - Nostr login, multi-account support, profile editing, and author pages
 - **Files**: `src/components/auth/LoginArea.tsx`, `src/components/EditProfileForm.tsx`, `src/pages/AuthorPage.tsx`
 
-### 7. **Advanced Nostr Features**
-- File uploads, zaps, rich text rendering, relay switching, event debugging
-- **Files**: `src/hooks/useUploadFile.ts`, `src/components/ZapButton.tsx`, `src/components/NoteContent.tsx`, `src/components/RelaySelector.tsx`
-
-### 8. **Developer Tools**
-- Event kind explorer, NIP-19 decoder, event viewer with JSON inspection
-- **Files**: `src/pages/KindPage.tsx`, `src/pages/Nip19Page.tsx`, `src/components/EventViewer.tsx`, `src/pages/EventPage.tsx`
+### 11. **Advanced Nostr Features**
+- File uploads via Blossom servers, rich text rendering, relay switching, event debugging
+- Enhanced UI with multiple view modes and filtering options
+- **Files**: `src/hooks/useUploadFile.ts`, `src/components/NoteContent.tsx`, `src/components/RelaySelector.tsx`
 
 ## System Prompt Management
 
@@ -135,9 +157,14 @@ The AI assistant's behavior and knowledge is defined by the CONTEXT.md file, whi
 1. Edit CONTEXT.md directly
 2. The changes take effect in the next session
 
-## "Vibed with MKStack"
+## The Lookup Branding
 
-When building the site for the first time, include "Vibed with MKStack" somewhere in the UI, linked to this URL: https://soapbox.pub/tools/mkstack/
+This project has evolved from NostrHub into "The Lookup" - a focused discovery platform for the Nostr ecosystem. Key branding changes include:
+- Site name: "The Lookup" (configurable via environment variables)
+- Color scheme: Updated from hot pink to purple-based theme
+- Enhanced UI features: Dual view modes, improved filtering, modern design system
+- Default relay: Changed to `wss://relay.primal.net` for better performance
+- Expanded features: Issue tracking, enhanced repository management, resources page
 
 ## Nostr Protocol Integration
 
@@ -595,11 +622,18 @@ The project includes an `AppProvider` that manages global application state incl
 ```typescript
 const defaultConfig: AppConfig = {
   theme: "light",
-  relayUrl: "wss://relay.nostr.band",
+  relayUrl: "wss://relay.primal.net",
 };
 ```
 
-Preset relays are available including Ditto, Nostr.Band, Damus, and Primal. The app uses local storage to persist user preferences.
+Preset relays are available including Ditto, Nostr.Band, Damus, and Primal. The app uses local storage to persist user preferences. Default relay changed to Primal for improved performance.
+
+### Environment Variables
+The app supports configurable site branding and features via environment variables:
+- `VITE_SITE_NAME`: Site name (default: "The Lookup")
+- `VITE_SITE_URL`: Site URL for deployment
+- `VITE_SITE_DISPLAY_NAME`: Display name for UI
+- `VITE_RELAY_NPUB`: Relay account npub for ownership claims
 
 ## Routing
 

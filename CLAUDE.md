@@ -2,9 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## NostrHub: Project Overview
+## The Lookup: Project Overview
 
-NostrHub is a comprehensive Nostr client application that serves as a hub for discovering and managing Nostr Implementation Possibilities (NIPs) and related content. It functions as both an official NIP browser and a custom NIP publishing platform built on the Nostr protocol.
+The Lookup is a comprehensive Nostr client application that serves as a discovery platform for Nostr apps, tools, resources, and implementation possibilities. Originally forked from NostrHub, it has evolved into a focused platform for exploring the Nostr ecosystem with enhanced features including app submissions, repository management, issue tracking, and lightning payments.
 
 ### Technology Stack
 - **React 18** with TypeScript for type safety
@@ -151,25 +151,55 @@ return useQuery({
 
 ## Key Features and Files
 
+### Nostr Apps Directory
+- Discover/submit apps by supported event kinds with lightning payments
+- Enhanced submission flow with NIP-57 zap receipt verification
+- Files: `src/pages/AppsPage.tsx`, `src/pages/SubmitAppPage.tsx`, `src/hooks/useApps.ts`
+- Components: `src/components/SubmitAppForm.tsx`, `src/components/AppCard.tsx`, `src/components/AppListItem.tsx`
+
+### Git Repositories Hub (NIP-34)
+- Comprehensive repository management with edit functionality
+- README display and enhanced metadata
+- Files: `src/pages/RepositoriesPage.tsx`, `src/pages/AnnounceRepositoryPage.tsx`, `src/pages/EditRepositoryPage.tsx`
+- Components: `src/components/RepositoryCard.tsx`
+
+### Issue Tracking System
+- Create and track issues for Nostr projects
+- Patch and pull request management
+- Files: `src/pages/IssuePage.tsx`, `src/pages/CreateIssuePage.tsx`, `src/pages/PatchPage.tsx`
+
 ### Official NIPs Browser
 - Browse/search official NIPs with carousel display
+- Enhanced with lightning support for NIP authors
 - Files: `src/pages/Index.tsx`, `src/hooks/useOfficialNips.ts`
 
 ### Custom NIPs Platform
 - Create/edit custom NIPs (kind 30817), comments, reactions
 - Files: `src/pages/CreateNipPage.tsx`, `src/pages/EditNipPage.tsx`
 
-### Nostr Apps Directory
-- Discover/submit apps by supported event kinds
-- Files: `src/pages/AppsPage.tsx`, `src/hooks/useApps.ts`
+### Resources Page
+- Curated collection of Nostr tools and resources
+- Files: `src/pages/ResourcesPage.tsx`
 
-### Git Repositories Hub (NIP-34)
-- Announce/discover git repositories with metadata
-- Files: `src/pages/RepositoriesPage.tsx`, `src/components/RepositoryCard.tsx`
+### Developer Tools
+- Event kind explorer, NIP-19 decoder, event viewer
+- DVM (Decentralized Virtual Machines) browsing
+- Files: `src/pages/KindPage.tsx`, `src/pages/Nip19Page.tsx`, `src/pages/DVMPage.tsx`
 
 ### Notifications System
 - Real-time notifications with read state management
 - Files: `src/pages/NotificationsPage.tsx`, `src/hooks/useNotifications.ts`
+
+### Lightning Payment Integration
+- Comprehensive NIP-57 zap support with WebLN and NWC
+- Payment processing for app submissions (planned feature)
+- Files: `src/hooks/useZap.ts`, `src/hooks/useZapReceipts.ts`, `src/components/ZapDialog.tsx`
+
+### Enhanced UI Features
+- Dual view modes (cards/list) for apps and repositories
+- Advanced filtering and search capabilities
+- App flagging system for content moderation
+- Configurable site branding and colors
 
 ## Testing
 
@@ -189,7 +219,7 @@ return useQuery({
 ```typescript
 const defaultConfig: AppConfig = {
   theme: "light",
-  relayUrl: "wss://relay.nostr.band",
+  relayUrl: "wss://relay.primal.net",
 };
 ```
 
@@ -197,6 +227,7 @@ const defaultConfig: AppConfig = {
 - Preset relays available: Ditto, Nostr.Band, Damus, Primal
 - Users can switch relays via `RelaySelector` component
 - Preferences persist in local storage
+- Default relay changed to Primal for improved performance
 
 ## Routing
 
@@ -210,12 +241,28 @@ const defaultConfig: AppConfig = {
 
 ### URL Structure
 - `/` - Apps page (default homepage)
+- `/apps/submit` - Submit new app (with lightning payment integration)
+- `/apps/edit/:naddr` - Edit existing app
+- `/apps/tag/:tag` - Apps filtered by tag
+- `/repositories` - Browse Nostr-related git repositories
+- `/repositories/announce` - Announce new repository
+- `/repositories/edit/:naddr` - Edit repository announcement
 - `/nips` - Official NIPs browser with carousel
 - `/nip/01` - View official NIP-01
 - `/nip/naddr1...` - View custom NIP by naddr
 - `/create` - Create new custom NIP
 - `/edit/naddr1...` - Edit existing custom NIP
-- `/my-nips` - View your published NIPs
+- `/resources` - Resources and tools page
+- `/notifications` - User notifications
+- `/kind/:number` - Explore event kinds
+- `/author/:npub` - Author profile page
+- `/event/:nevent` - Individual event view
+- `/nip19` - NIP-19 decoder tool
+- `/dvm` - Decentralized Virtual Machines
+- `/issues` - Issue tracking system
+- `/issues/create` - Create new issue
+- `/issue/:nevent` - View issue
+- `/patch/:nevent` - View patch
 
 ## File Uploads
 
