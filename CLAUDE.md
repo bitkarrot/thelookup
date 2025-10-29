@@ -219,15 +219,17 @@ return useQuery({
 ```typescript
 const defaultConfig: AppConfig = {
   theme: "light",
-  relayUrl: "wss://relay.primal.net",
+  relayUrl: import.meta.env.VITE_DEFAULT_RELAY_URL || "wss://relay.nostr.net",
 };
 ```
 
 ### Relay Options
-- Preset relays available: Ditto, Nostr.Band, Damus, Primal
+- Preset relays available: Ditto, Nostr.Band, Damus, Primal, Nostr.net
 - Users can switch relays via `RelaySelector` component
 - Preferences persist in local storage
-- Default relay changed to Primal for improved performance
+- **Primary relay**: Configurable via `VITE_DEFAULT_RELAY_URL` (default: `wss://relay.nostr.net`)
+  - Used for app submissions, custom NIPs, and repositories
+- **Zap receipt relay**: `wss://relay.primal.net` for NIP-57 payment verification (configurable via `VITE_APP_SUBMISSION_ZAP_RECEIPT_RELAY`)
 
 ## Routing
 

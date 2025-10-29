@@ -4,11 +4,11 @@
  */
 
 export function getSiteName(): string {
-  return import.meta.env.VITE_SITE_NAME || 'nostrhub.io';
+  return import.meta.env.VITE_SITE_NAME || 'lookup.hivetalk.org';
 }
 
 export function getSiteUrl(): string {
-  return import.meta.env.VITE_SITE_URL || 'https://nostrhub.io';
+  return import.meta.env.VITE_SITE_URL || 'https://lookup.hivetalk.org';
 }
 
 export function getClientTag(): string {

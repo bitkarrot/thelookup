@@ -163,8 +163,9 @@ This project has evolved from NostrHub into "The Lookup" - a focused discovery p
 - Site name: "The Lookup" (configurable via environment variables)
 - Color scheme: Updated from hot pink to purple-based theme
 - Enhanced UI features: Dual view modes, improved filtering, modern design system
-- Default relay: Changed to `wss://relay.primal.net` for better performance
-- Expanded features: Issue tracking, enhanced repository management, resources page
+- **Primary relay**: `wss://relay.nostr.net` for content submissions
+- **Zap receipt relay**: `wss://relay.primal.net` for payment verification
+- Expanded features: Issue tracking, enhanced repository management, resources page, lightning payments
 
 ## Nostr Protocol Integration
 
@@ -622,18 +623,29 @@ The project includes an `AppProvider` that manages global application state incl
 ```typescript
 const defaultConfig: AppConfig = {
   theme: "light",
-  relayUrl: "wss://relay.primal.net",
+  relayUrl: import.meta.env.VITE_DEFAULT_RELAY_URL || "wss://relay.nostr.net",
 };
 ```
 
-Preset relays are available including Ditto, Nostr.Band, Damus, and Primal. The app uses local storage to persist user preferences. Default relay changed to Primal for improved performance.
+Preset relays are available including Ditto, Nostr.Band, Damus, Primal, and Nostr.net. The app uses local storage to persist user preferences.
+
+### Relay Configuration
+- **Primary relay**: Configurable via `VITE_DEFAULT_RELAY_URL` environment variable (default: `wss://relay.nostr.net`)
+  - Used for app submissions, custom NIPs, and repositories
+- **Zap receipt relay**: `wss://relay.primal.net` - Used specifically for NIP-57 payment verification (configurable via `VITE_APP_SUBMISSION_ZAP_RECEIPT_RELAY`)
+- Users can switch relays via `RelaySelector` component for content discovery
 
 ### Environment Variables
 The app supports configurable site branding and features via environment variables:
-- `VITE_SITE_NAME`: Site name (default: "The Lookup")
+- `VITE_SITE_NAME`: Site name (default: "lookup.hivetalk.org")
 - `VITE_SITE_URL`: Site URL for deployment
 - `VITE_SITE_DISPLAY_NAME`: Display name for UI
+- `VITE_DEFAULT_RELAY_URL`: Primary relay for content submissions (default: "wss://relay.nostr.net")
 - `VITE_RELAY_NPUB`: Relay account npub for ownership claims
+- `VITE_APP_SUBMISSION_PAYMENT_REQUIRED`: Enable/disable lightning payments for app submissions
+- `VITE_APP_SUBSCRIPTION_LIGHTNING_ADDRESS`: Lightning address for submission fees
+- `VITE_APP_SUBMISSION_FEE_SATS`: Fee amount for app submissions in satoshis
+- `VITE_APP_SUBMISSION_ZAP_RECEIPT_RELAY`: Relay for monitoring NIP-57 zap receipts (default: `wss://relay.primal.net`)
 
 ## Routing
 

@@ -21,7 +21,7 @@ export const RELAY_OPTIONS: RelayInfo[] = [
 
 // Default application configuration
 const DEFAULT_CONFIG: AppConfig = {
-  relayUrl: 'wss://relay.nostr.net',
+  relayUrl: import.meta.env.VITE_DEFAULT_RELAY_URL || 'wss://relay.nostr.net',
   theme: 'dark',
 };
 
