@@ -1,7 +1,7 @@
 // NOTE: This file should normally not be modified unless you are adding a new provider.
 // To add new routes, edit the AppRouter.tsx file.
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { createHead, UnheadProvider } from '@unhead/react/client';
 import { InferSeoMetaPlugin } from '@unhead/addons';
 import NostrProvider from '@/components/NostrProvider'
@@ -13,6 +13,7 @@ import { AppProvider } from './components/AppProvider';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { NWCProvider } from './contexts/NWCContext';
 import AppRouter from './AppRouter';
+import { runStartupValidations, logValidationResults } from '@/lib/startupValidation';
 
 const head = createHead({
   plugins: [
@@ -31,6 +32,15 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
+  // Run startup validations
+  useEffect(() => {
+    runStartupValidations()
+      .then(logValidationResults)
+      .catch(error => {
+        console.error('Failed to run startup validations:', error);
+      });
+  }, []);
+
   return (
     <UnheadProvider head={head}>
       <AppProvider>
