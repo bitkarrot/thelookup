@@ -27,11 +27,12 @@ const PaymentContent = forwardRef<HTMLDivElement, {
   config: ReturnType<typeof useAppSubmissionPayment>['config'];
   qrCodeUrl: string;
   copied: boolean;
+  isWebLNAvailable: boolean;
   onCopy: () => void;
   onOpenInWallet: () => void;
   onRetry: () => void;
   onCancel: () => void;
-}>(({ state, config, qrCodeUrl, copied, onCopy, onOpenInWallet, onRetry, onCancel }, ref) => {
+}>(({ state, config, qrCodeUrl, copied, isWebLNAvailable, onCopy, onOpenInWallet, onRetry, onCancel }, ref) => {
   const formatTimeRemaining = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -145,6 +146,35 @@ const PaymentContent = forwardRef<HTMLDivElement, {
       {/* QR Code and Invoice */}
       {state.invoice ? (
         <div className="flex flex-col justify-center min-h-0 flex-1 px-4 py-4">
+          {/* Invoice input - Moved above QR code */}
+          <div className="space-y-2 mb-4">
+            <label className="text-sm font-medium">Lightning Invoice</label>
+            <div className="flex gap-2">
+              <input
+                value={state.invoice}
+                readOnly
+                className="flex-1 px-3 py-2 text-sm bg-muted border rounded-md font-mono text-center"
+                onClick={(e) => e.currentTarget.select()}
+                placeholder="Invoice will appear here..."
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onCopy}
+                className="shrink-0"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {copied && (
+              <p className="text-xs text-green-600 text-center">Invoice copied to clipboard!</p>
+            )}
+          </div>
+
           {/* QR Code */}
           <div className="flex justify-center mb-4">
             <Card className="p-3 max-w-[280px] mx-auto">
@@ -161,55 +191,6 @@ const PaymentContent = forwardRef<HTMLDivElement, {
               </CardContent>
             </Card>
           </div>
-
-          {/* Invoice input */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Lightning Invoice</label>
-            <div className="flex gap-2">
-              <input
-                value={state.invoice}
-                readOnly
-                className="flex-1 px-3 py-2 text-sm bg-muted border rounded-md font-mono"
-                onClick={(e) => e.currentTarget.select()}
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={onCopy}
-                className="shrink-0"
-              >
-                {copied ? (
-                  <Check className="h-4 w-4 text-green-600" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Payment buttons */}
-          <div className="space-y-3 mt-4">
-            <Button
-              onClick={onOpenInWallet}
-              className="w-full"
-              size="lg"
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open in Lightning Wallet
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={onCancel}
-              className="w-full"
-            >
-              Cancel Payment
-            </Button>
-
-            <div className="text-xs text-muted-foreground text-center">
-              Scan the QR code or copy the invoice to pay with any Lightning wallet.
-            </div>
-          </div>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 px-8">
@@ -218,6 +199,68 @@ const PaymentContent = forwardRef<HTMLDivElement, {
           </p>
         </div>
       )}
+
+      {/* Payment buttons */}
+      <div className="space-y-3 mt-4">
+        {/* Show WebLN warning if not available */}
+        {!isWebLNAvailable && (
+          <div className="p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              <span className="font-medium">WebLN Wallet Extension</span>
+              <br />
+              Install a WebLN-compatible wallet for one-click payments, or use the QR code below.
+            </p>
+          </div>
+        )}
+
+        {isWebLNAvailable ? (
+          <Button
+            onClick={onOpenInWallet}
+            className="w-full"
+            size="lg"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Open in Lightning Wallet
+          </Button>
+        ) : (
+          <Button
+            onClick={() => window.open('https://getalby.com', '_blank')}
+            variant="outline"
+            className="w-full"
+            size="lg"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Get Lightning Wallet
+          </Button>
+        )}
+
+        {/* TEMPORARY DEBUG: Manual receipt check button */}
+        <Button
+          onClick={() => {
+            console.log('🔧 DEBUG: Manual receipt check triggered');
+            // This will trigger the next polling cycle immediately
+          }}
+          variant="secondary"
+          className="w-full"
+          size="sm"
+        >
+          🔧 Check for Payment (Debug)
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={onCancel}
+          className="w-full"
+        >
+          Cancel Payment
+        </Button>
+
+        {isWebLNAvailable && (
+          <div className="text-xs text-muted-foreground text-center">
+            Scan the QR code or copy the invoice to pay with any Lightning wallet.
+          </div>
+        )}
+      </div>
     </div>
   );
 });
@@ -230,7 +273,7 @@ export function AppSubmissionPaymentDialog({
   onPaymentSuccess,
   onPaymentCancelled,
 }: AppSubmissionPaymentDialogProps) {
-  const { state, config, generateInvoice, resetPaymentState } = useAppSubmissionPayment();
+  const { state, config, generateInvoice, resetPaymentState, isWebLNAvailable } = useAppSubmissionPayment();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
@@ -324,6 +367,10 @@ export function AppSubmissionPaymentDialog({
   };
 
   const handleCancel = () => {
+    toast({
+      title: 'Payment Cancelled',
+      description: 'App submission was cancelled.',
+    });
     resetPaymentState();
     onPaymentCancelled();
     onOpenChange(false);
@@ -344,6 +391,7 @@ export function AppSubmissionPaymentDialog({
             config={config}
             qrCodeUrl={qrCodeUrl}
             copied={copied}
+            isWebLNAvailable={isWebLNAvailable}
             onCopy={handleCopy}
             onOpenInWallet={openInWallet}
             onRetry={handleRetry}

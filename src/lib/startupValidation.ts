@@ -47,7 +47,7 @@ export async function validateLightningPaymentSetup(): Promise<ValidationResult>
     }
 
     if (!lnurlInfo.nostrPubkey) {
-      result.warnings.push(`Lightning address ${config.lightningAddress} does not support NIP-57 zaps`);
+      result.warnings.push(`Lightning address ${config.lightningAddress} may not support NIP-57 zaps - this could affect payment verification`);
     }
 
     // Test zap endpoint availability (without making actual payment)
