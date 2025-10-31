@@ -17,11 +17,12 @@ interface RelayInfo {
 // Available relay options
 export const RELAY_OPTIONS: RelayInfo[] = [
   { url: 'wss://relay.nostr.net', name: 'Nostr.NET' },
+  { url: 'wss://hivetalk.nostr1.com', name: 'HiveTalk' },
 ];
 
 // Default application configuration
 const DEFAULT_CONFIG: AppConfig = {
-  relayUrl: 'wss://relay.nostr.net',
+  relayUrl: import.meta.env.VITE_RELAY_URL || 'wss://relay.nostr.net',
   theme: 'dark',
 };
 
