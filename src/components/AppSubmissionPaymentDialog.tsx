@@ -109,8 +109,15 @@ export function AppSubmissionPaymentDialog({
   // Auto-verify payment when invoice is created
   useEffect(() => {
     if (paymentState.invoice && !paymentState.paid && !isVerifyingPayment) {
+      console.log('🔄 Starting payment verification polling...', {
+        invoice: paymentState.invoice.substring(0, 20) + '...',
+        paid: paymentState.paid,
+        verifying: isVerifyingPayment
+      });
+      
       // Set up polling to check for payment confirmation
       const pollInterval = setInterval(() => {
+        console.log('⚡ Checking for payment...');
         verifyPayment();
       }, 5000); // Check every 5 seconds
 
@@ -123,9 +130,16 @@ export function AppSubmissionPaymentDialog({
       }, 10000); // Show after 10 seconds
 
       return () => {
+        console.log('🛑 Stopping payment verification polling');
         clearInterval(pollInterval);
         clearTimeout(timeoutId);
       };
+    } else {
+      console.log('❌ Not starting polling:', {
+        hasInvoice: !!paymentState.invoice,
+        paid: paymentState.paid,
+        verifying: isVerifyingPayment
+      });
     }
   }, [paymentState.invoice, paymentState.paid, isVerifyingPayment, verifyPayment, toast]);
 

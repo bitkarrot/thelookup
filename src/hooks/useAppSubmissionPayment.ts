@@ -306,6 +306,14 @@ export function useAppSubmissionPayment() {
             return false;
           }
 
+          // CRITICAL: Verify this receipt is for the current invoice
+          if (bolt11Tag[1] !== paymentState.invoice) {
+            console.log('❌ Receipt not for current invoice');
+            console.log('  Expected invoice:', paymentState.invoice?.substring(0, 30) + '...');
+            console.log('  Receipt invoice:', bolt11Tag[1]?.substring(0, 30) + '...');
+            return false;
+          }
+
           // Parse the zap request from the description
           let zapRequestFromReceipt;
           try {
@@ -324,6 +332,14 @@ export function useAppSubmissionPayment() {
           // Check if this zap request is from our user
           if (zapRequestFromReceipt.pubkey !== user.pubkey) {
             console.log('❌ Zap request not from our user');
+            return false;
+          }
+
+          // CRITICAL: Verify this is the exact zap request for this submission
+          if (zapRequestFromReceipt.id !== paymentState.zapRequest?.id) {
+            console.log('❌ Receipt not for current zap request');
+            console.log('  Expected zap request ID:', paymentState.zapRequest?.id?.substring(0, 16) + '...');
+            console.log('  Receipt zap request ID:', zapRequestFromReceipt.id?.substring(0, 16) + '...');
             return false;
           }
           
