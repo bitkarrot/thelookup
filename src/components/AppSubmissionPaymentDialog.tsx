@@ -187,7 +187,7 @@ export function AppSubmissionPaymentDialog({
           <DialogDescription>
             A payment of {paymentConfig.feeAmount} sats is required to submit your app to the directory.
           </DialogDescription>
-          {isVerifyingPayment && (
+          {isVerifyingPayment && paymentState.invoice && (
             <div className="flex items-center justify-center mt-2 text-sm text-orange-600 dark:text-orange-400">
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               Verifying payment...
