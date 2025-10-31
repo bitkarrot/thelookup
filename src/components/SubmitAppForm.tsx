@@ -13,7 +13,6 @@ import { Separator } from '@/components/ui/separator';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useToast } from '@/hooks/useToast';
-import { useAppsByAuthor } from '@/hooks/useAppsByAuthor';
 import { useAppSubmissionPayment } from '@/hooks/useAppSubmissionPayment';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { TagInput } from '@/components/TagInput';
@@ -53,9 +52,8 @@ export function SubmitAppForm() {
   const navigate = useNavigate();
   const { config } = useAppConfig();
 
-  // Check if user already has apps (to determine if payment is required)
-  const { data: userApps } = useAppsByAuthor(user?.pubkey || '');
-  const _hasExistingApps = userApps && userApps.length > 0;
+  // SubmitAppForm is always for NEW app submissions, so payment is always required
+  // (EditAppForm is used for editing existing apps, which doesn't require payment)
 
   // Payment functionality
   const { isPaymentRequired, paymentConfig } = useAppSubmissionPayment();
@@ -258,14 +256,14 @@ export function SubmitAppForm() {
       return;
     }
 
-    // Check if payment is required (only for users without existing apps)
-    if (isPaymentRequired && !_hasExistingApps && paymentConfig) {
+    // Check if payment is required (always required for new app submissions)
+    if (isPaymentRequired && paymentConfig) {
       // Store form data and show payment dialog
       setPendingFormData(data);
       setShowPaymentDialog(true);
       toast({
         title: 'Payment Required',
-        description: `A payment of ${paymentConfig?.feeAmount || 0} sats is required for new app submissions.`,
+        description: `A payment of ${paymentConfig?.feeAmount || 0} sats is required for all new app submissions.`,
       });
     } else {
       // Submit directly without payment
@@ -675,7 +673,7 @@ export function SubmitAppForm() {
             >
               {isPending || isSubmitting ? (
                 'Submitting...'
-              ) : isPaymentRequired && !_hasExistingApps ? (
+              ) : isPaymentRequired ? (
                 <>
                   <CreditCard className="h-4 w-4 mr-2" />
                   Pay & Submit App
