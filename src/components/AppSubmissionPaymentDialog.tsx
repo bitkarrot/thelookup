@@ -36,7 +36,6 @@ export function AppSubmissionPaymentDialog({
     createPayment,
     verifyPayment,
     resetPayment,
-    debugZapReceipts,
     isCreatingPayment,
     isVerifyingPayment,
   } = useAppSubmissionPayment();
@@ -44,13 +43,34 @@ export function AppSubmissionPaymentDialog({
   const [copied, setCopied] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes in seconds
 
-  // Reset confirmation flag when dialog opens
+  // Reset confirmation flag and timer when dialog opens
   useEffect(() => {
     if (open) {
       setHasConfirmed(false);
+      setTimeRemaining(300); // Reset to 5 minutes
     }
   }, [open]);
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (!open || !paymentState.invoice || paymentState.paid || timeRemaining <= 0) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [open, paymentState.invoice, paymentState.paid, timeRemaining]);
 
   // Generate QR code when invoice is available
   useEffect(() => {
@@ -184,8 +204,7 @@ export function AppSubmissionPaymentDialog({
               <div>
                 <h3 className="text-lg font-semibold mb-2">Payment Required</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  To submit your app to the directory, a small fee of {paymentConfig.feeAmount} sats is required.
-                  This helps maintain the quality of the directory and prevents spam.
+                  Scan the QR code or copy the invoice to pay with any Lightning wallet.
                 </p>
               </div>
               <Button
@@ -212,31 +231,33 @@ export function AppSubmissionPaymentDialog({
           {paymentState.invoice && !paymentState.paid && (
             <div className="space-y-4">
               {/* Payment amount display */}
-              <div className="text-center">
-                <div className="text-2xl font-bold">{paymentConfig.feeAmount} sats</div>
-                <div className="text-sm text-muted-foreground">App submission fee</div>
+              <div className="text-center space-y-3">
+                <div>
+                  <div className="text-2xl font-bold">{paymentConfig.feeAmount} sats</div>
+                  <div className="text-sm text-muted-foreground">App submission fee</div>
+                </div>
+                
+                {/* Timer bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs text-muted-foreground">
+                    <span>Payment expires in:</span>
+                    <span className="font-mono">
+                      {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-1000 ${
+                        timeRemaining > 60 ? 'bg-blue-500' : 
+                        timeRemaining > 30 ? 'bg-yellow-500' : 'bg-red-500'
+                      }`}
+                      style={{ width: `${(timeRemaining / 300) * 100}%` }}
+                    />
+                  </div>
+                </div>
               </div>
 
               <Separator />
-
-              {/* QR Code */}
-              <div className="flex justify-center">
-                <Card className="p-3 max-w-[280px] mx-auto">
-                  <CardContent className="p-0 flex justify-center">
-                    {qrCodeUrl ? (
-                      <img
-                        src={qrCodeUrl}
-                        alt="Lightning Invoice QR Code"
-                        className="w-full h-auto max-w-[280px] rounded"
-                      />
-                    ) : (
-                      <div className="w-[280px] h-[280px] bg-muted rounded flex items-center justify-center">
-                        <Loader2 className="h-8 w-8 animate-spin" />
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
 
               {/* Invoice input */}
               <div className="space-y-2">
@@ -263,6 +284,25 @@ export function AppSubmissionPaymentDialog({
                 </div>
               </div>
 
+              {/* QR Code */}
+              <div className="flex justify-center">
+                <Card className="p-3 max-w-[280px] mx-auto">
+                  <CardContent className="p-0 flex justify-center">
+                    {qrCodeUrl ? (
+                      <img
+                        src={qrCodeUrl}
+                        alt="Lightning Invoice QR Code"
+                        className="w-full h-auto max-w-[280px] rounded"
+                      />
+                    ) : (
+                      <div className="w-[280px] h-[280px] bg-muted rounded flex items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin" />
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
               {/* Payment buttons */}
               <div className="space-y-2">
                 {webln && (
@@ -276,43 +316,6 @@ export function AppSubmissionPaymentDialog({
                     Pay with WebLN
                   </Button>
                 )}
-
-                <div className="text-xs text-muted-foreground text-center space-y-1">
-                  <p>Scan the QR code or copy the invoice to pay with any Lightning wallet.</p>
-                  <p className="text-green-600 dark:text-green-400">
-                    ✓ Payment verification happens automatically every 5 seconds
-                  </p>
-                  <p className="text-blue-600 dark:text-blue-400">
-                    ⏱️ You have up to 5 minutes to complete the payment
-                  </p>
-                </div>
-
-                {/* Debug and testing buttons */}
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => debugZapReceipts()}
-                    className="flex-1"
-                    size="sm"
-                  >
-                    🔍 Debug Receipts
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      // Manual override for testing
-                      if (!hasConfirmed) {
-                        setHasConfirmed(true);
-                        onPaymentConfirmed();
-                        onOpenChange(false);
-                      }
-                    }}
-                    className="flex-1"
-                    size="sm"
-                  >
-                    Manual Override
-                  </Button>
-                </div>
               </div>
             </div>
           )}
