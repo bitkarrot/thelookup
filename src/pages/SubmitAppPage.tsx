@@ -8,10 +8,11 @@ import { Link } from 'react-router-dom';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 
 export default function SubmitAppPage() {
-  // Get fee amount from environment variable
+  // Get payment configuration from environment variables
+  const paymentEnabled = import.meta.env.VITE_SUBMIT_APP_PAYMENT_ENABLED === 'true';
   const feeAmount = parseInt(import.meta.env.VITE_SUBMIT_APP_FEE || '0', 10);
   const lightningAddress = import.meta.env.VITE_SUBMIT_APP_LIGHTNING_ADDRESS;
-  const isPaymentEnabled = lightningAddress && feeAmount > 0;
+  const isPaymentEnabled = paymentEnabled && lightningAddress && feeAmount > 0;
 
   useSeoMeta({
     title: getPageTitle('Submit App'),

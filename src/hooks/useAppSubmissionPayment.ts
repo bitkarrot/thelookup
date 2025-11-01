@@ -43,12 +43,21 @@ export function useAppSubmissionPayment() {
 
   // Get payment configuration from environment
   const getPaymentConfig = useCallback((): PaymentConfig | null => {
+    // Check if payment is enabled via master toggle
+    const paymentEnabled = import.meta.env.VITE_SUBMIT_APP_PAYMENT_ENABLED === 'true';
+    
+    if (!paymentEnabled) {
+      return null; // Payment disabled
+    }
+
     const lightningAddress = import.meta.env.VITE_SUBMIT_APP_LIGHTNING_ADDRESS;
     const feeAmount = parseInt(import.meta.env.VITE_SUBMIT_APP_FEE || '0', 10);
 
     if (!lightningAddress || !feeAmount || feeAmount <= 0) {
+      console.warn('Payment enabled but missing Lightning address or fee amount');
       return null;
     }
+    
     return {
       lightningAddress,
       feeAmount,
