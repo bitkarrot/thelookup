@@ -20,9 +20,44 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+// Navigation configuration
+interface NavSection {
+  id: string;
+  path: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  special?: boolean; // For special styling like "Create NIP"
+}
+
+const ALL_SECTIONS: NavSection[] = [
+  { id: 'resources', path: '/resources', label: 'Resources', icon: Globe },
+  { id: 'nips', path: '/nips', label: 'NIPs', icon: Zap },
+  { id: 'apps', path: '/apps', label: 'Apps', icon: Smartphone },
+  { id: 'repositories', path: '/repositories', label: 'Repositories', icon: GitBranch },
+  // { id: 'dvm', path: '/dvm', label: 'DVM', icon: Bot }, // Commented out in original
+];
+
+// Get visible sections based on environment configuration
+function getVisibleSections(): NavSection[] {
+  const sectionsConfig = import.meta.env.VITE_SECTIONS;
+  
+  if (!sectionsConfig || sectionsConfig.trim() === '') {
+    // Show all sections by default
+    return ALL_SECTIONS;
+  }
+  
+  const enabledSections = sectionsConfig
+    .split(',')
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean);
+  
+  return ALL_SECTIONS.filter(section => enabledSections.includes(section.id));
+}
+
 export function Layout({ children }: LayoutProps) {
   const isMobile = useIsMobile();
   const { theme, toggleTheme } = useTheme();
+  const visibleSections = getVisibleSections();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex flex-col">
@@ -47,36 +82,22 @@ export function Layout({ children }: LayoutProps) {
           {/* Desktop Navigation */}
           {!isMobile && (
             <nav className="flex items-center space-x-2">
-              <Button variant="ghost" asChild className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                <Link to="/resources">
-                  <Globe className="h-4 w-4 mr-2" />
-                  Resources
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                <Link to="/nips">
-                  <Zap className="h-4 w-4 mr-2" />
-                  NIPs
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                <Link to="/apps">
-                  <Smartphone className="h-4 w-4 mr-2" />
-                  Apps
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                <Link to="/repositories">
-                  <GitBranch className="h-4 w-4 mr-2" />
-                  Repositories
-                </Link>
-              </Button>
-              {/* <Button variant="ghost" asChild className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                <Link to="/dvm">
-                  <Bot className="h-4 w-4 mr-2" />
-                  DVM
-                </Link>
-              </Button> */}
+              {visibleSections.map((section) => {
+                const IconComponent = section.icon;
+                return (
+                  <Button 
+                    key={section.id}
+                    variant="ghost" 
+                    asChild 
+                    className="text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300"
+                  >
+                    <Link to={section.path}>
+                      <IconComponent className="h-4 w-4 mr-2" />
+                      {section.label}
+                    </Link>
+                  </Button>
+                );
+              })}
               <div className="ml-4 flex">
                 <LoginArea />
               </div>
@@ -103,42 +124,32 @@ export function Layout({ children }: LayoutProps) {
                   <div className="flex flex-col space-y-6 mt-6">
                     {/* Navigation Links */}
                     <nav className="flex flex-col space-y-4">
-                      <Button variant="ghost" asChild className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                        <Link to="/resources">
-                          <Globe className="h-4 w-4 mr-3" />
-                          Resources
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" asChild className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                        <Link to="/nips">
-                          <Zap className="h-4 w-4 mr-3" />
-                          NIPs
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" asChild className="justify-start bg-purple-600/10 hover:bg-purple-600/20 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300">
-                        <Link to="/create">
-                          <Plus className="h-4 w-4 mr-3" />
-                          Create NIP
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" asChild className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                        <Link to="/apps">
-                          <Smartphone className="h-4 w-4 mr-3" />
-                          Apps
-                        </Link>
-                      </Button>
-                      <Button variant="ghost" asChild className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                        <Link to="/repositories">
-                          <GitBranch className="h-4 w-4 mr-3" />
-                          Repositories
-                        </Link>
-                      </Button>
-                      {/* <Button variant="ghost" asChild className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300">
-                        <Link to="/dvm">
-                          <Bot className="h-4 w-4 mr-3" />
-                          DVM Marketplace
-                        </Link>
-                      </Button> */}
+                      {visibleSections.map((section) => {
+                        const IconComponent = section.icon;
+                        return (
+                          <Button 
+                            key={section.id}
+                            variant="ghost" 
+                            asChild 
+                            className="justify-start text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300"
+                          >
+                            <Link to={section.path}>
+                              <IconComponent className="h-4 w-4 mr-3" />
+                              {section.label}
+                            </Link>
+                          </Button>
+                        );
+                      })}
+                      
+                      {/* Special Create NIP button - always show if NIPs section is visible */}
+                      {visibleSections.some(s => s.id === 'nips') && (
+                        <Button variant="ghost" asChild className="justify-start bg-purple-600/10 hover:bg-purple-600/20 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-300">
+                          <Link to="/create">
+                            <Plus className="h-4 w-4 mr-3" />
+                            Create NIP
+                          </Link>
+                        </Button>
+                      )}
                     </nav>
 
                     <Separator />
