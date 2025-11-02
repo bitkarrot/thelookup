@@ -40,6 +40,16 @@ jobs:
       - name: Install dependencies and build
         env:
           GITHUB_PAGES: true
+          VITE_SITE_NAME: bitkarrot.github.io/thelookup
+          VITE_SITE_URL: https://bitkarrot.github.io/thelookup
+          VITE_SITE_DISPLAY_NAME: NostrHub
+          VITE_SECTIONS: ""
+          VITE_RELAY_URL: wss://relay.nostr.net
+          VITE_RELAY_NPUB: npub18pudjhdhhp2v8gxnkttt00um729nv93tuepjda2jrwn3eua5tf5s80a699
+          VITE_SUBMIT_APP_PAYMENT_ENABLED: ""
+          VITE_SUBMIT_APP_LIGHTNING_ADDRESS: ""
+          VITE_SUBMIT_APP_FEE: ""
+          VITE_ZAP_RECEIPT_RELAY: ""
         run: |
           npm install
           npm run build
