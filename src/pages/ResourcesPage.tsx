@@ -1,92 +1,14 @@
 import { useSeoMeta } from '@unhead/react';
 import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ExternalLink, Globe, Zap, GitBranch, Search, Users, Shield, BookOpen, Hash } from 'lucide-react';
+import { ExternalLink, Zap, Loader2, AlertCircle } from 'lucide-react';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
-
-interface Resource {
-  name: string;
-  url: string;
-  description: string;
-  icon: React.ReactNode;
-  category: string;
-}
-
-const resources: Resource[] = [
-  {
-    name: 'nostr.net',
-    url: 'https://nostr.net',
-    description: 'Home of awesome-nostr repository',
-    icon: <Globe className="h-6 w-6" />,
-    category: 'Official'
-  },
-  {
-    name: 'wot.nostr.net',
-    url: 'https://wot.nostr.net',
-    description: 'Web of trust relay',
-    icon: <Users className="h-6 w-6" />,
-    category: 'Relay'
-  },
-  {
-    name: 'relay.nostr.net',
-    url: 'https://relay.nostr.net',
-    description: 'Public relay run by nostr.net',
-    icon: <Zap className="h-6 w-6" />,
-    category: 'Relay'
-  },
-  {
-    name: 'start.nostr.net',
-    url: 'https://start.nostr.net',
-    description: 'Onboarding for new users',
-    icon: <BookOpen className="h-6 w-6" />,
-    category: 'Tools'
-  },
-  {
-    name: 'my.nostr.net',
-    url: 'https://my.nostr.net',
-    description: 'Nostr profile and data management',
-    icon: <Shield className="h-6 w-6" />,
-    category: 'Tools'
-  },
-  {
-    name: 'nostr.at',
-    url: 'https://nostr.at',
-    description: 'Public njump instance without any tracking',
-    icon: <Hash className="h-6 w-6" />,
-    category: 'Gateway'
-  },
-  {
-    name: 'nostr.eu',
-    url: 'https://nostr.eu',
-    description: 'Nostr landing page and http gateway in all European languages',
-    icon: <Globe className="h-6 w-6" />,
-    category: 'Gateway'
-  },
-  {
-    name: 'nostr.ae',
-    url: 'https://nostr.ae',
-    description: 'Nostr landing page for the Middle East',
-    icon: <Globe className="h-6 w-6" />,
-    category: 'Gateway'
-  },
-  {
-    name: 'search.nostr.net',
-    url: 'https://search.nostr.net',
-    description: 'Search events across nostr relays',
-    icon: <Search className="h-6 w-6" />,
-    category: 'Tools'
-  }
-];
-
-const categoryColors: Record<string, string> = {
-  Official: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
-  Relay: 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20',
-  Tools: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
-  Client: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
-  Gateway: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20'
-};
+import { useResources } from '@/hooks/useResources';
+import { categoryColors } from '@/lib/parseResources';
 
 export default function ResourcesPage() {
+  const { resources, loading, error } = useResources();
+
   useSeoMeta({
     title: getPageTitle('Nostr Resources'),
     description: getPageDescription('Discover essential Nostr resources, tools, and services to enhance your decentralized social experience.'),
@@ -98,9 +20,9 @@ export default function ResourcesPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Globe className="h-12 w-12 text-primary" />
-            <h1 className="text-4xl font-bold title-duotone">
-              Discover Nostr Resources
+            <Zap className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Nostr Resources
             </h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -108,51 +30,75 @@ export default function ResourcesPage() {
           </p>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2 text-muted-foreground">Loading resources...</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="flex items-center justify-center py-12">
+            <Card className="bg-destructive/5 border-destructive/20">
+              <CardContent className="py-6">
+                <div className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="h-5 w-5" />
+                  <span>Failed to load resources: {error}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Resources Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {resources.map((resource) => (
-            <Card
-              key={resource.name}
-              className="group hover:shadow-lg transition-all duration-300 border-primary/20 hover:border-accent/60 bg-card/50 backdrop-blur-sm cursor-pointer"
-              onClick={() => window.open(resource.url, '_blank', 'noopener,noreferrer')}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-accent/20 group-hover:text-accent transition-colors">
-                      {resource.icon}
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg group-hover:text-accent transition-colors">
-                        {resource.name}
-                      </CardTitle>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-xs px-2 py-1 rounded-full border ${categoryColors[resource.category]}`}>
-                          {resource.category}
-                        </span>
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {resources.map((resource) => (
+              <Card
+                key={resource.name}
+                className="group transition-all duration-300 border-primary/20 hover:border-accent/60 bg-card shadow-sm hover:shadow-lg cursor-pointer"
+                onClick={() => window.open(resource.url, '_blank', 'noopener,noreferrer')}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-accent/20 group-hover:text-accent transition-colors">
+                        {resource.icon}
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg group-hover:text-accent transition-colors">
+                          {resource.name}
+                        </CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs px-2 py-1 rounded-full border ${categoryColors[resource.category]}`}>
+                            {resource.category}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  {resource.description}
-                </p>
-                <a
-                  href={resource.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-2 text-sm text-white hover:text-accent transition-colors font-medium"
-                >
-                  Visit Resource
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-4 leading-relaxed">
+                    {resource.description}
+                  </p>
+                  <a
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-2 text-sm text-white hover:text-accent transition-colors font-medium"
+                  >
+                    Visit Resource
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {/* Footer Info */}
         <div className="mt-16 text-center">

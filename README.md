@@ -196,6 +196,18 @@ TheLookup supports **Lightning payments for app submissions** to prevent spam an
 
 For detailed setup instructions, configuration options, and troubleshooting, see **[LIGHTNING_PAYMENTS.md](./LIGHTNING_PAYMENTS.md)**.
 
+### Resources Management
+
+The `/resources` page displays community resources from a **markdown file** for easy editing:
+
+- **Non-Technical Editing**: Resources are stored in `public/RESOURCES.md` 
+- **Simple Format**: Each resource uses standard markdown with metadata
+- **No Code Required**: Add, edit, or remove resources without touching code
+- **Automatic Icons**: Choose from predefined Lucide icons
+- **Categories**: Organize resources by type (Official, Relay, Tools, etc.)
+
+To edit resources, simply modify **[public/RESOURCES.md](./public/RESOURCES.md)** following the documented format.
+
 ## App Flagging System
 
 The app directory includes a community-driven content moderation system using NIP-1984 report events:
