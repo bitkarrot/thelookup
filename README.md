@@ -208,6 +208,18 @@ The `/resources` page displays community resources from a **markdown file** for 
 
 To edit resources, simply modify **[public/RESOURCES.md](./public/RESOURCES.md)** following the documented format.
 
+### Featured Apps Management
+
+The home page displays **featured Nostr applications** from a markdown file for easy curation:
+
+- **Community Curation**: Featured apps are stored in `public/FEATURED_APPS.md`
+- **Rich Metadata**: Each app includes category, platform, description, and icon
+- **Platform Support**: Tag apps by platform (Web, iOS, Android, Desktop, All)
+- **Categories**: Organize by type (Social, Client, Tools, Media, Gaming, etc.)
+- **Flexible Display**: Component supports limits, filtering, and custom styling
+
+To manage featured apps, edit **[public/FEATURED_APPS.md](./public/FEATURED_APPS.md)** following the documented format.
+
 ## App Flagging System
 
 The app directory includes a community-driven content moderation system using NIP-1984 report events:

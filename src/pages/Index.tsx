@@ -1,4 +1,5 @@
 import { CustomNipCard } from '@/components/CustomNipCard';
+import { FeaturedApps } from '@/components/FeaturedApps';
 import { Layout } from '@/components/Layout';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +15,7 @@ import { useSeoMeta } from '@unhead/react';
 import { AlertTriangle, BookOpen, Plus, Search, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getPageTitle, getPageDescription, getSiteFullName } from '@/lib/siteConfig';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 
 const Index = () => {
   useSeoMeta({
@@ -259,6 +260,13 @@ const Index = () => {
             </Card>
           )}
         </div>
+
+        {/* Featured Apps Section */}
+        <FeaturedApps 
+          title="Featured Apps"
+          subtitle="Discover the most popular applications in the Nostr ecosystem"
+          className="space-y-4 sm:space-y-6"
+        />
 
         {/* Custom NIPs List */}
         <div className="space-y-4 sm:space-y-6">
