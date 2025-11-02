@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+//import { ThemeTest } from "@/components/theme-test";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { LoginArea } from "@/components/auth/LoginArea";
 import { Footer } from "@/components/Footer";
@@ -61,6 +63,8 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex flex-col">
+      {/* Temporary theme test - remove this after confirming theme works */}
+      {/* <ThemeTest /> */}
 
       {/* <header className="glass border-b border-white/10 sticky top-0 z-50"> */}
       <header className="border-b border-white/10 sticky top-0 z-50">
