@@ -210,13 +210,21 @@ To edit resources, simply modify **[public/RESOURCES.md](./public/RESOURCES.md)*
 
 ### Featured Apps Management
 
-The home page displays **featured Nostr applications** from a markdown file for easy curation:
+The `/apps` page displays **featured Nostr applications** in an auto-rotating carousel from a markdown file for easy curation:
 
+- **Auto-Rotating Carousel**: 4-second intervals with smooth transitions and infinite loop
+- **Responsive Layout**: Shows 2-4 cards per row based on screen width (mobile: 2, tablet: 3, desktop: 4)
+- **Authentic Icons**: Uses actual website favicons/logos via remote URLs
 - **Community Curation**: Featured apps are stored in `public/FEATURED_APPS.md`
-- **Rich Metadata**: Each app includes category, platform, description, and icon
+- **Rich Metadata**: Each app includes category, platform, description, and icon URL
 - **Platform Support**: Tag apps by platform (Web, iOS, Android, Desktop, All)
 - **Categories**: Organize by type (Social, Client, Tools, Media, Gaming, etc.)
-- **Flexible Display**: Component supports limits, filtering, and custom styling
+- **Interactive Features**: Manual navigation, hover effects, and click-to-visit functionality
+- **Strategic Placement**: Positioned prominently at the top of `/apps` page above search filters
+
+**Icon Support**: 
+- **Remote URLs**: Use `https://website.com/favicon.ico` for actual website icons
+- **Fallback Icons**: Lucide icon names for consistent styling when needed
 
 To manage featured apps, edit **[public/FEATURED_APPS.md](./public/FEATURED_APPS.md)** following the documented format.
 
