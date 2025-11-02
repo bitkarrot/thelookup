@@ -31,10 +31,13 @@ VITE_RELAY_URL=wss://relay.nostr.net
 ### Payment Configuration
 
 ```bash
-# Lightning address that supports NIP-57 (required)
+# Enable or disable payment requirement (required)
+VITE_SUBMIT_APP_PAYMENT_ENABLED=true
+
+# Lightning address that supports NIP-57 (required if enabled)
 VITE_SUBMIT_APP_LIGHTNING_ADDRESS=payments@yourdomain.com
 
-# Fee amount in satoshis (required)
+# Fee amount in satoshis (required if enabled)
 VITE_SUBMIT_APP_FEE=1000
 ```
 
@@ -232,7 +235,11 @@ VITE_SUBMIT_APP_LIGHTNING_ADDRESS=payments@getalby.com
 To disable the payment system entirely:
 
 ```bash
-# Remove or comment out these lines:
+# Set the payment enabled flag to false or remove it:
+VITE_SUBMIT_APP_PAYMENT_ENABLED=false
+
+# Or remove/comment out all payment-related variables:
+# VITE_SUBMIT_APP_PAYMENT_ENABLED=
 # VITE_SUBMIT_APP_LIGHTNING_ADDRESS=
 # VITE_SUBMIT_APP_FEE=
 ```

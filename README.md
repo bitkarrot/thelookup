@@ -184,6 +184,18 @@ npx shadcn@latest add https://tweakcn.com/r/themes/[theme-id]
 
 The theme system uses OKLCH color spaces for vibrant, consistent colors across light and dark modes.
 
+### Lightning Payments
+
+TheLookup supports **Lightning payments for app submissions** to prevent spam and maintain directory quality:
+
+- **NIP-57 Integration**: Uses Lightning Zaps for payment verification
+- **Configurable Fees**: Set custom satoshi amounts for new submissions
+- **Smart Logic**: Only new users pay - existing app authors can edit for free
+- **Multiple Wallets**: Supports QR codes, WebLN, and manual invoice copying
+- **Anti-Spam**: Helps maintain high-quality app directory
+
+For detailed setup instructions, configuration options, and troubleshooting, see **[LIGHTNING_PAYMENTS.md](./LIGHTNING_PAYMENTS.md)**.
+
 ## App Flagging System
 
 The app directory includes a community-driven content moderation system using NIP-1984 report events:
