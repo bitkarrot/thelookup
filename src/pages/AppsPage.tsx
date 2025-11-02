@@ -80,7 +80,6 @@ export default function AppsPage() {
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Discover applications that can handle different types of Nostr events. 
-              Find the perfect app for your needs.
             </p>
             
             {/* Stats and Submit Button */}
@@ -102,6 +101,16 @@ export default function AppsPage() {
                 </Link>
               </Button>
             </div>
+          </div>
+
+          {/* Featured Apps Section */}
+          <div className="mt-8">
+            <FeaturedApps 
+              title="Featured Apps"
+              subtitle=""
+              titleAlignment="left"
+              className="space-y-4 sm:space-y-6"
+            />
           </div>
 
           {/* Search and Filters */}
@@ -202,15 +211,6 @@ export default function AppsPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Featured Apps Section */}
-        <div className="mt-8 px-4 sm:px-0">
-          <FeaturedApps 
-            title="Featured Apps"
-            subtitle="Discover the most popular applications in the Nostr ecosystem"
-            className="space-y-4 sm:space-y-6"
-          />
         </div>
 
         {/* Loading State */}
