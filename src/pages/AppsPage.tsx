@@ -1,6 +1,7 @@
 import { useSeoMeta } from '@unhead/react';
-import { useState, useMemo, React } from 'react';
+import { useState, useMemo } from 'react';
 import { Layout } from '@/components/Layout';
+import { FeaturedApps } from '@/components/FeaturedApps';
 import { useApps } from '@/hooks/useApps';
 import { AppCard } from '@/components/AppCard';
 import { AppCardSkeleton } from '@/components/AppCardSkeleton';
@@ -201,6 +202,15 @@ export default function AppsPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Featured Apps Section */}
+        <div className="mt-8 px-4 sm:px-0">
+          <FeaturedApps 
+            title="Featured Apps"
+            subtitle="Discover the most popular applications in the Nostr ecosystem"
+            className="space-y-4 sm:space-y-6"
+          />
         </div>
 
         {/* Loading State */}

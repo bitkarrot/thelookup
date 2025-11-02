@@ -1,5 +1,4 @@
 import { CustomNipCard } from '@/components/CustomNipCard';
-import { FeaturedApps } from '@/components/FeaturedApps';
 import { Layout } from '@/components/Layout';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Badge } from '@/components/ui/badge';
@@ -260,13 +259,6 @@ const Index = () => {
             </Card>
           )}
         </div>
-
-        {/* Featured Apps Section */}
-        <FeaturedApps 
-          title="Featured Apps"
-          subtitle="Discover the most popular applications in the Nostr ecosystem"
-          className="space-y-4 sm:space-y-6"
-        />
 
         {/* Custom NIPs List */}
         <div className="space-y-4 sm:space-y-6">
