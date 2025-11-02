@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ExternalLink, Loader2, AlertCircle, Star } from 'lucide-react';
 import { useFeaturedApps } from '@/hooks/useFeaturedApps';
 import { appCategoryColors, platformColors } from '@/lib/parseFeaturedApps';
@@ -170,6 +170,8 @@ export function FeaturedApps({
             </CarouselItem>
           ))}
         </CarouselContent>
+        <CarouselPrevious className="hidden sm:flex" />
+        <CarouselNext className="hidden sm:flex" />
       </Carousel>
 
       {/* Show more link if limited */}
