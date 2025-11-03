@@ -66,6 +66,7 @@ interface ZapContentProps {
   inputRef: React.RefObject<HTMLInputElement>;
   zap: (amount: number, comment: string) => void;
   hasLightningAddress: boolean;
+  user: { pubkey: string } | undefined;
 }
 
 // Moved ZapContent outside of ZapDialog to prevent re-renders causing focus loss
@@ -85,6 +86,7 @@ const ZapContent = forwardRef<HTMLDivElement, ZapContentProps>(({
   inputRef,
   zap,
   hasLightningAddress,
+  user,
 }, ref) => (
   <div ref={ref}>
     {invoice ? (
@@ -267,7 +269,8 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
   const { user } = useCurrentUser();
   const { data: author } = useAuthor(target.pubkey);
   const { toast } = useToast();
-  const { webln, activeNWC } = useWallet();
+  const { webln, getActiveConnection } = useWallet();
+  const activeNWC = getActiveConnection();
   const { zap, isZapping, invoice, setInvoice } = useZaps(target, webln, activeNWC, () => setOpen(false));
   const [amount, setAmount] = useState<number | string>(100);
   const [comment, setComment] = useState<string>('');
@@ -359,7 +362,7 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
   };
 
   // Check if author has lightning address
-  const hasLightningAddress = author?.metadata?.lud06 || author?.metadata?.lud16;
+  const hasLightningAddress = !!(author?.metadata?.lud06 || author?.metadata?.lud16);
 
   const contentProps = {
     invoice,
@@ -377,6 +380,7 @@ export function ZapDialog({ target, children, className }: ZapDialogProps) {
     inputRef,
     zap,
     hasLightningAddress,
+    user,
   };
 
   if (user?.pubkey === target.pubkey) {

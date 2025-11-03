@@ -4,18 +4,18 @@ import type { WebLNProvider } from '@webbtc/webln-types';
 
 export function useWallet() {
   const [webln, setWebln] = useState<WebLNProvider | null>(null);
-  const { getActiveConnection, activeNWC } = useNWC();
+  const { getActiveConnection, activeConnection } = useNWC();
 
   useEffect(() => {
     // Check for WebLN provider
     if (typeof window !== 'undefined' && 'webln' in window) {
-      setWebln((window as any).webln as WebLNProvider);
+      setWebln((window as { webln?: WebLNProvider }).webln || null);
     }
   }, []);
 
   return {
     webln,
-    activeNWC,
+    activeNWC: activeConnection,
     getActiveConnection,
   };
 }

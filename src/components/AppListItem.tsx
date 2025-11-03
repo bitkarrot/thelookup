@@ -32,9 +32,9 @@ export function AppListItem({ app }: AppListItemProps) {
       {/* App Icon */}
       <div className="flex-shrink-0">
         <Avatar className="h-12 w-12">
-          <AvatarImage src={app.picture} alt={app.name} />
+          <AvatarImage src={app.picture} alt={app.name || 'App'} />
           <AvatarFallback className="text-lg">
-            {app.name.slice(0, 2).toUpperCase()}
+            {(app.name || 'App').slice(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
       </div>

@@ -63,12 +63,12 @@ export default function AppDetailPage() {
   const authorMetadata = author.data?.metadata;
 
   // Get flagging data for this app
-  const { flagStats, canFlag, userFlag, isLoading: isFlagsLoading } = useAppFlags(app?.id || '', app?.pubkey || '');
+  const { flagStats, canFlag, userFlag, isLoading: _isFlagsLoading } = useAppFlags(app?.id || '', app?.pubkey || '');
 
   // Set SEO meta
   useSeoMeta({
     title: app ? getPageTitle(app.name || 'Nostr App') : getPageTitle('App Details'),
-    description: getPageDescription('app', { appName: app?.name || 'this app' }),
+    description: getPageDescription(`Discover ${app?.name || 'this app'} - a Nostr application`),
   });
   
   if (!nip19Param) {
