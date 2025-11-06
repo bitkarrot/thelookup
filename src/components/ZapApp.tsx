@@ -37,11 +37,13 @@ export function ZapApp({ event, className }: ZapAppProps) {
         
         <Separator />
         
-        <ZapReceipts
-          eventId={event.id}
-          eventCoordinate={eventCoordinate}
-          maxDisplay={3}
-        />
+        <div className="max-h-[100px] overflow-y-auto pr-1">
+          <ZapReceipts
+            eventId={event.id}
+            eventCoordinate={eventCoordinate}
+            maxDisplay={10}
+          />
+        </div>
       </CardContent>
     </Card>
   );
