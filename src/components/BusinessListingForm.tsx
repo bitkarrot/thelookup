@@ -71,30 +71,27 @@ export function BusinessListingForm() {
 
     setIsSubmitting(true);
 
-    const dTag = Math.random().toString(36).substring(2, 15);
+    // Generate a stall id and ensure d-tag matches it per NIP-15
+    const stallId = Math.random().toString(36).substring(2, 15);
 
     const tags: string[][] = [
-      ['d', dTag],
-      ['title', data.title.trim()],
+      ['d', stallId],
+      // Use t-tags as categories for the stall
+      ...data.tags.map((tag) => ['t', tag]),
     ];
 
-    if (data.summary.trim()) tags.push(['summary', data.summary.trim()]);
-    if (data.location.trim()) tags.push(['location', data.location.trim()]);
-    if (data.image.trim()) tags.push(['image', data.image.trim(), '256x256']);
-    if (data.status.trim()) tags.push(['status', data.status.trim()]);
+    // NIP-15 stall content
+    const stallContent = {
+      id: stallId,
+      name: data.title.trim(),
+      description: data.description.trim() || undefined,
+      currency: (data.priceCurrency || 'USD').trim() || 'USD',
+      // For now we don't collect detailed shipping zones in the form;
+      // clients can treat this as a simple business directory stall.
+      shipping: [] as unknown[],
+    };
 
-    if (data.priceAmount.trim() && data.priceCurrency.trim()) {
-      tags.push([
-        'price',
-        data.priceAmount.trim(),
-        data.priceCurrency.trim(),
-        data.priceFrequency.trim() || undefined,
-      ] as unknown as string[]);
-    }
-
-    tags.push(...data.tags.map((tag) => ['t', tag]));
-
-    const content = data.description.trim();
+    const content = JSON.stringify(stallContent);
 
     toast({
       title: 'Publishing Listing',
@@ -103,7 +100,7 @@ export function BusinessListingForm() {
 
     publishEvent(
       {
-        kind: 30402,
+        kind: 30017,
         content,
         tags,
       },

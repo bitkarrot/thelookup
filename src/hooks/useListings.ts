@@ -2,56 +2,68 @@ import { useQuery } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
 import type { NostrEvent } from '@nostrify/nostrify';
 
-export interface BusinessListingInfo {
+// NIP-15 stall (business) model - kind 30017
+export interface StallShippingZone {
   id: string;
+  name?: string;
+  cost: number;
+  regions: string[];
+}
+
+export interface BusinessStallInfo {
+  id: string; // nostr event id
   pubkey: string;
-  title: string;
-  summary?: string;
-  content: string;
-  image?: string;
-  location?: string;
-  priceAmount?: number;
-  priceCurrency?: string;
-  priceFrequency?: string;
-  status?: string;
-  tags: string[];
+  stallId: string; // stall "id" from content / d-tag
+  name: string;
+  description?: string;
+  currency: string;
+  shipping: StallShippingZone[];
+  tags: string[]; // t-tags for categories
   createdAt: number;
   dTag: string;
   event: NostrEvent;
 }
 
-function validateListingEvent(event: NostrEvent): boolean {
-  if (event.kind !== 30402) return false;
+function validateStallEvent(event: NostrEvent): boolean {
+  if (event.kind !== 30017) return false;
 
   const dTag = event.tags.find(([name]) => name === 'd')?.[1];
   if (!dTag) return false;
 
-  const titleTag = event.tags.find(([name]) => name === 'title')?.[1];
-  if (!titleTag) return false;
+  // Basic content validation: must parse as JSON with at least id + name + currency
+  try {
+    const content = JSON.parse(event.content || '{}') as {
+      id?: string;
+      name?: string;
+      currency?: string;
+    };
+
+    if (!content.id || !content.name || !content.currency) return false;
+
+    // d tag must match stall id
+    if (content.id !== dTag) return false;
+  } catch {
+    return false;
+  }
 
   return true;
 }
 
-function parseListingEvent(event: NostrEvent): BusinessListingInfo {
+function parseStallEvent(event: NostrEvent): BusinessStallInfo {
   const dTag = event.tags.find(([name]) => name === 'd')?.[1] || '';
-  const title = event.tags.find(([name]) => name === 'title')?.[1] || '';
-  const summary = event.tags.find(([name]) => name === 'summary')?.[1];
-  const location = event.tags.find(([name]) => name === 'location')?.[1];
-  const status = event.tags.find(([name]) => name === 'status')?.[1];
-  const image = event.tags.find(([name]) => name === 'image')?.[1];
 
-  const priceTag = event.tags.find(([name]) => name === 'price');
-  let priceAmount: number | undefined;
-  let priceCurrency: string | undefined;
-  let priceFrequency: string | undefined;
-  if (priceTag) {
-    const [, amountStr, currency, frequency] = priceTag;
-    const parsedAmount = parseFloat(amountStr || '');
-    if (!isNaN(parsedAmount)) {
-      priceAmount = parsedAmount;
-    }
-    priceCurrency = currency;
-    priceFrequency = frequency;
+  let content: {
+    id?: string;
+    name?: string;
+    description?: string;
+    currency?: string;
+    shipping?: StallShippingZone[];
+  } = {};
+
+  try {
+    content = JSON.parse(event.content || '{}');
+  } catch {
+    // leave content empty-object - validateStallEvent should have already caught bad JSON
   }
 
   const tags = event.tags
@@ -61,15 +73,11 @@ function parseListingEvent(event: NostrEvent): BusinessListingInfo {
   return {
     id: event.id,
     pubkey: event.pubkey,
-    title,
-    summary,
-    content: event.content,
-    image,
-    location,
-    priceAmount,
-    priceCurrency,
-    priceFrequency,
-    status,
+    stallId: content.id ?? dTag,
+    name: content.name ?? '',
+    description: content.description,
+    currency: content.currency ?? '',
+    shipping: content.shipping ?? [],
     tags,
     createdAt: event.created_at,
     dTag,
@@ -81,15 +89,15 @@ export function useListings() {
   const { nostr } = useNostr();
 
   return useQuery({
-    queryKey: ['business-listings'],
+    queryKey: ['business-stalls'],
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
 
-      const events = await nostr.query([{ kinds: [30402], limit: 100 }], { signal });
-      const validEvents = events.filter(validateListingEvent);
-      const listings = validEvents.map(parseListingEvent);
+      const events = await nostr.query([{ kinds: [30017], limit: 100 }], { signal });
+      const validEvents = events.filter(validateStallEvent);
+      const stalls = validEvents.map(parseStallEvent);
 
-      return listings.sort((a, b) => b.createdAt - a.createdAt);
+      return stalls.sort((a, b) => b.createdAt - a.createdAt);
     },
     staleTime: 5 * 60 * 1000,
   });

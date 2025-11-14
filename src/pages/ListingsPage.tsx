@@ -15,7 +15,7 @@ import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 export default function ListingsPage() {
   useSeoMeta({
     title: getPageTitle('Business Directory'),
-    description: getPageDescription('Discover products and services published as Nostr NIP-99 classified listings.'),
+    description: getPageDescription('Discover NIP-15 marketplace stalls (businesses) published on the Nostr network.'),
   });
 
   const { data: listings, isLoading, error } = useListings();
@@ -32,9 +32,8 @@ export default function ListingsPage() {
     listings?.filter((listing) => {
       const matchesSearch =
         !searchTerm ||
-        listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.content.toLowerCase().includes(searchTerm.toLowerCase());
+        listing.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listing.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesTag = !selectedTag || listing.tags?.includes(selectedTag);
 
@@ -56,14 +55,14 @@ export default function ListingsPage() {
               <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Business Directory</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover products and services published as NIP-99 classified listings on the Nostr network.
+              Discover businesses and marketplace stalls (NIP-15 kind 30017) published on the Nostr network.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
                   <Store className="h-4 w-4" />
-                  <span>{totalListings} Listings</span>
+                  <span>{totalListings} Businesses</span>
                 </div>
               </div>
               <Button asChild className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
@@ -143,10 +142,10 @@ export default function ListingsPage() {
               <>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6 px-4 sm:px-0">
                   <div>
-                    <h2 className="text-xl font-semibold">All Listings</h2>
+                    <h2 className="text-xl font-semibold">All Businesses</h2>
                     <span className="text-sm text-muted-foreground mt-1">
                       {filteredListings.length}{' '}
-                      {filteredListings.length === 1 ? 'listing' : 'listings'}
+                      {filteredListings.length === 1 ? 'business' : 'businesses'}
                     </span>
                   </div>
 
@@ -171,21 +170,12 @@ export default function ListingsPage() {
                     {filteredListings.map((listing) => (
                       <Card key={listing.id} className="h-full flex flex-col sm:rounded-lg rounded-none">
                         <CardHeader>
-                          <CardTitle className="text-lg truncate">{listing.title}</CardTitle>
+                          <CardTitle className="text-lg truncate">{listing.name}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
-                          {listing.summary && (
-                            <p className="text-sm text-muted-foreground line-clamp-2">
-                              {listing.summary}
-                            </p>
-                          )}
-                          {listing.location && (
-                            <p className="text-xs text-muted-foreground">Location: {listing.location}</p>
-                          )}
-                          {listing.priceAmount !== undefined && listing.priceCurrency && (
-                            <p className="text-sm font-medium">
-                              {listing.priceAmount} {listing.priceCurrency}
-                              {listing.priceFrequency && ` / ${listing.priceFrequency}`}
+                          {listing.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-3">
+                              {listing.description}
                             </p>
                           )}
                           {listing.tags.length > 0 && (
@@ -207,21 +197,15 @@ export default function ListingsPage() {
                       {filteredListings.map((listing) => (
                         <div key={listing.id} className="p-4 flex flex-col gap-2">
                           <div className="flex items-center justify-between gap-2">
-                            <h3 className="font-semibold text-foreground truncate">{listing.title}</h3>
-                            {listing.priceAmount !== undefined && listing.priceCurrency && (
-                              <span className="text-sm font-medium">
-                                {listing.priceAmount} {listing.priceCurrency}
-                                {listing.priceFrequency && ` / ${listing.priceFrequency}`}
-                              </span>
-                            )}
+                            <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
                           </div>
-                          {listing.summary && (
+                          {listing.description && (
                             <p className="text-sm text-muted-foreground line-clamp-2">
-                              {listing.summary}
+                              {listing.description}
                             </p>
                           )}
                           <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                            <span>{listing.location || 'Location not specified'}</span>
+                            <span>{listing.currency || 'Currency not specified'}</span>
                             {listing.tags.length > 0 && (
                               <div className="flex flex-wrap gap-1">
                                 {listing.tags.slice(0, 3).map((tag) => (
