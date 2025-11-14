@@ -1,0 +1,266 @@
+import { useSeoMeta } from '@unhead/react';
+import { useState, useMemo } from 'react';
+import { Layout } from '@/components/Layout';
+import { useListings } from '@/hooks/useListings';
+import { RelaySelector } from '@/components/RelaySelector';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Search, Store, Plus, Grid3x3, List } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
+
+export default function ListingsPage() {
+  useSeoMeta({
+    title: getPageTitle('Business Directory'),
+    description: getPageDescription('Discover products and services published as Nostr NIP-99 classified listings.'),
+  });
+
+  const { data: listings, isLoading, error } = useListings();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('list');
+
+  const allTags = useMemo(() => {
+    const tags = listings?.flatMap((listing) => listing.tags || []) || [];
+    return Array.from(new Set(tags)).sort();
+  }, [listings]);
+
+  const filteredListings =
+    listings?.filter((listing) => {
+      const matchesSearch =
+        !searchTerm ||
+        listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listing.summary?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listing.content.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesTag = !selectedTag || listing.tags?.includes(selectedTag);
+
+      return matchesSearch && matchesTag;
+    }) || [];
+
+  const totalListings = filteredListings.length;
+
+  return (
+    <Layout>
+      <div className="max-w-6xl mx-auto">
+        <div className="px-4 sm:px-0 space-y-6">
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center space-x-3">
+              <div className="relative">
+                <Store className="h-8 w-8 text-primary" />
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Business Directory</h1>
+            </div>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Discover products and services published as NIP-99 classified listings on the Nostr network.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                <div className="flex items-center space-x-2">
+                  <Store className="h-4 w-4" />
+                  <span>{totalListings} Listings</span>
+                </div>
+              </div>
+              <Button asChild className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+                <Link to="/listings/submit">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Submit Listing
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          <Card className="sm:rounded-lg rounded-none">
+            <CardHeader>
+              <CardTitle className="text-lg">Find Listings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search listings by title, summary, or description..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Filter by Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge
+                      variant={selectedTag === null ? 'default' : 'outline'}
+                      className="cursor-pointer"
+                      onClick={() => setSelectedTag(null)}
+                    >
+                      All Tags
+                    </Badge>
+                    {allTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant={selectedTag === tag ? 'default' : 'outline'}
+                        className="cursor-pointer"
+                        onClick={() => setSelectedTag(tag)}
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {isLoading && (
+          <div className="mt-6 text-center text-muted-foreground">Loading listings...</div>
+        )}
+
+        {error && (
+          <div className="mt-6">
+            <Card className="border-dashed sm:rounded-lg rounded-none mx-4 sm:mx-0">
+              <CardContent className="py-12 px-8 text-center">
+                <div className="max-w-sm mx-auto space-y-6">
+                  <p className="text-muted-foreground">
+                    Failed to load listings. Try switching to a different relay?
+                  </p>
+                  <RelaySelector className="w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {!isLoading && !error && (
+          <>
+            {filteredListings.length > 0 ? (
+              <>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6 px-4 sm:px-0">
+                  <div>
+                    <h2 className="text-xl font-semibold">All Listings</h2>
+                    <span className="text-sm text-muted-foreground mt-1">
+                      {filteredListings.length}{' '}
+                      {filteredListings.length === 1 ? 'listing' : 'listings'}
+                    </span>
+                  </div>
+
+                  <ToggleGroup
+                    type="single"
+                    value={viewMode}
+                    onValueChange={(value) => setViewMode(value as 'cards' | 'list')}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <ToggleGroupItem value="list" aria-label="List view">
+                      <List className="h-4 w-4" />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="cards" aria-label="Card view">
+                      <Grid3x3 className="h-4 w-4" />
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
+
+                {viewMode === 'cards' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6">
+                    {filteredListings.map((listing) => (
+                      <Card key={listing.id} className="h-full flex flex-col sm:rounded-lg rounded-none">
+                        <CardHeader>
+                          <CardTitle className="text-lg truncate">{listing.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          {listing.summary && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {listing.summary}
+                            </p>
+                          )}
+                          {listing.location && (
+                            <p className="text-xs text-muted-foreground">Location: {listing.location}</p>
+                          )}
+                          {listing.priceAmount !== undefined && listing.priceCurrency && (
+                            <p className="text-sm font-medium">
+                              {listing.priceAmount} {listing.priceCurrency}
+                              {listing.priceFrequency && ` / ${listing.priceFrequency}`}
+                            </p>
+                          )}
+                          {listing.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {listing.tags.slice(0, 4).map((tag) => (
+                                <Badge key={tag} variant="outline" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="sm:rounded-lg rounded-none mt-6">
+                    <div className="divide-y">
+                      {filteredListings.map((listing) => (
+                        <div key={listing.id} className="p-4 flex flex-col gap-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <h3 className="font-semibold text-foreground truncate">{listing.title}</h3>
+                            {listing.priceAmount !== undefined && listing.priceCurrency && (
+                              <span className="text-sm font-medium">
+                                {listing.priceAmount} {listing.priceCurrency}
+                                {listing.priceFrequency && ` / ${listing.priceFrequency}`}
+                              </span>
+                            )}
+                          </div>
+                          {listing.summary && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {listing.summary}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                            <span>{listing.location || 'Location not specified'}</span>
+                            {listing.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {listing.tags.slice(0, 3).map((tag) => (
+                                  <Badge key={tag} variant="outline" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                )}
+              </>
+            ) : (
+              <div className="mt-6">
+                <Card className="border-dashed sm:rounded-lg rounded-none mx-4 sm:mx-0">
+                  <CardContent className="py-12 px-8 text-center">
+                    <div className="max-w-sm mx-auto space-y-6">
+                      <div className="space-y-2">
+                        <Store className="h-12 w-12 text-muted-foreground mx-auto" />
+                        <h3 className="text-lg font-medium">No Listings Found</h3>
+                        <p className="text-muted-foreground">
+                          {searchTerm || selectedTag
+                            ? 'No listings match your current filters. Try adjusting your search or filters.'
+                            : 'No listings found on this relay. Try switching to a different relay or submit a new listing.'}
+                        </p>
+                      </div>
+                      {!searchTerm && !selectedTag && <RelaySelector className="w-full" />}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </Layout>
+  );
+}
