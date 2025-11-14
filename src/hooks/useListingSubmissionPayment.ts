@@ -91,9 +91,11 @@ export function useListingSubmissionPayment() {
       const lnurlPayUrl = `https://${domain}/.well-known/lnurlp/${name}`;
       const lnurl = encodeLnurl(lnurlPayUrl);
 
+      const zapRelaysEnv = import.meta.env.VITE_ZAP_RECEIPT_RELAY;
       const zapRelays = [
         import.meta.env.VITE_RELAY_URL || 'wss://relay.nostr.net',
         'wss://relay.primal.net',
+        ...(zapRelaysEnv ? [zapRelaysEnv] : []),
       ];
 
       const zapRequestEvent: NostrEvent = {
@@ -184,9 +186,10 @@ export function useListingSubmissionPayment() {
       const zapRequestRelays =
         paymentState.zapRequest.tags.find((tag) => tag[0] === 'relays')?.slice(1) || [];
 
+      const zapReceiptRelayEnv = import.meta.env.VITE_ZAP_RECEIPT_RELAY;
       const relaysToCheck = [
         ...zapRequestRelays,
-        'wss://relay.primal.net',
+        zapReceiptRelayEnv || 'wss://relay.primal.net',
         'wss://nos.lol',
         'wss://relay.damus.io',
       ];

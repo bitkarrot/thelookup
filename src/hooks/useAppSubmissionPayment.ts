@@ -100,9 +100,11 @@ export function useAppSubmissionPayment() {
 
       // Define relays where zap receipt should be published
       // Include both our relay AND Primal's relay to ensure we can find the receipt
+      const zapRelaysEnv = import.meta.env.VITE_ZAP_RECEIPT_RELAY;
       const zapRelays = [
         import.meta.env.VITE_RELAY_URL || 'wss://relay.nostr.net',
         'wss://relay.primal.net', // Primal's relay for zap receipts
+        ...(zapRelaysEnv ? [zapRelaysEnv] : []),
       ];
 
       // Create zap request manually for profile zap (kind 9734)
@@ -213,9 +215,10 @@ export function useAppSubmissionPayment() {
         .find(tag => tag[0] === 'relays')
         ?.slice(1) || [];
       
+      const zapReceiptRelayEnv = import.meta.env.VITE_ZAP_RECEIPT_RELAY;
       const relaysToCheck = [
         ...zapRequestRelays, // Check our specified relays first
-        'wss://relay.primal.net', // Primal's main relay (in case they ignore our relays tag)
+        zapReceiptRelayEnv || 'wss://relay.primal.net', // Use configured zap receipt relay if provided
         'wss://nos.lol',
         'wss://relay.damus.io',
       ];
