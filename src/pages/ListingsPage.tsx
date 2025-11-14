@@ -6,6 +6,7 @@ import { RelaySelector } from '@/components/RelaySelector';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Search, Store, Plus, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -170,7 +171,17 @@ export default function ListingsPage() {
                     {filteredListings.map((listing) => (
                       <Card key={listing.id} className="h-full flex flex-col sm:rounded-lg rounded-none">
                         <CardHeader>
-                          <CardTitle className="text-lg truncate">{listing.name}</CardTitle>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10">
+                              {listing.image && (
+                                <AvatarImage src={listing.image} alt={listing.name} />
+                              )}
+                              <AvatarFallback>
+                                {listing.name.slice(0, 2).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <CardTitle className="text-lg truncate">{listing.name}</CardTitle>
+                          </div>
                         </CardHeader>
                         <CardContent className="space-y-2">
                           {listing.description && (
@@ -197,7 +208,17 @@ export default function ListingsPage() {
                       {filteredListings.map((listing) => (
                         <div key={listing.id} className="p-4 flex flex-col gap-2">
                           <div className="flex items-center justify-between gap-2">
-                            <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <Avatar className="h-8 w-8 flex-shrink-0">
+                                {listing.image && (
+                                  <AvatarImage src={listing.image} alt={listing.name} />
+                                )}
+                                <AvatarFallback className="text-xs">
+                                  {listing.name.slice(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
+                            </div>
                           </div>
                           {listing.description && (
                             <p className="text-sm text-muted-foreground line-clamp-2">

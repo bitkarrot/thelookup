@@ -40,6 +40,22 @@ export function BusinessListingForm() {
   const [pendingFormData, setPendingFormData] = useState<BusinessListingFormData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // NIP-15 stall shipping zones
+  type ShippingZoneForm = {
+    id: string;
+    name: string;
+    cost: string;
+    regions: string;
+  };
+
+  const [shippingZones, setShippingZones] = useState<ShippingZoneForm[]>([]);
+  const [newShippingZone, setNewShippingZone] = useState<ShippingZoneForm>({
+    id: '',
+    name: '',
+    cost: '',
+    regions: '',
+  });
+
   const {
     register,
     handleSubmit,
@@ -63,6 +79,7 @@ export function BusinessListingForm() {
   });
 
   const watchedTags = watch('tags');
+  const watchedCurrency = watch('priceCurrency');
 
   const submitListingToRelay = (data: BusinessListingFormData) => {
     if (isSubmitting) {
@@ -81,14 +98,24 @@ export function BusinessListingForm() {
     ];
 
     // NIP-15 stall content
+    const parsedShipping = shippingZones
+      .filter((zone) => zone.id.trim())
+      .map((zone) => ({
+        id: zone.id.trim(),
+        name: zone.name.trim() || undefined,
+        cost: parseFloat(zone.cost || '0') || 0,
+        regions: zone.regions
+          .split(',')
+          .map((r) => r.trim())
+          .filter(Boolean),
+      }));
+
     const stallContent = {
       id: stallId,
       name: data.title.trim(),
       description: data.description.trim() || undefined,
       currency: (data.priceCurrency || 'USD').trim() || 'USD',
-      // For now we don't collect detailed shipping zones in the form;
-      // clients can treat this as a simple business directory stall.
-      shipping: [] as unknown[],
+      shipping: parsedShipping,
     };
 
     const content = JSON.stringify(stallContent);
@@ -300,6 +327,118 @@ export function BusinessListingForm() {
                 />
               </div>
             </div>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Shipping Zones</h3>
+            <p className="text-sm text-muted-foreground">
+              Define the shipping zones for this stall (business). Customers will choose one of these zones
+              at checkout. Regions are comma-separated (for example: US, CA, EU).
+            </p>
+
+            {/* New shipping zone inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+              <div className="space-y-2">
+                <Label htmlFor="shippingZoneId">Zone ID</Label>
+                <Input
+                  id="shippingZoneId"
+                  value={newShippingZone.id}
+                  onChange={(e) => setNewShippingZone({ ...newShippingZone, id: e.target.value })}
+                  placeholder="zone-id"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="shippingZoneName">Name</Label>
+                <Input
+                  id="shippingZoneName"
+                  value={newShippingZone.name}
+                  onChange={(e) => setNewShippingZone({ ...newShippingZone, name: e.target.value })}
+                  placeholder="e.g., North America"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="shippingZoneCost">Base Cost</Label>
+                <Input
+                  id="shippingZoneCost"
+                  type="number"
+                  min="0"
+                  value={newShippingZone.cost}
+                  onChange={(e) => setNewShippingZone({ ...newShippingZone, cost: e.target.value })}
+                  placeholder="e.g., 10.0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="shippingZoneRegions">Regions</Label>
+                <div className="flex space-x-2">
+                  <Input
+                    id="shippingZoneRegions"
+                    value={newShippingZone.regions}
+                    onChange={(e) => setNewShippingZone({ ...newShippingZone, regions: e.target.value })}
+                    placeholder="US, CA, EU"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={!newShippingZone.id.trim()}
+                    onClick={() => {
+                      if (!newShippingZone.id.trim()) return;
+                      setShippingZones([
+                        ...shippingZones,
+                        {
+                          id: newShippingZone.id.trim(),
+                          name: newShippingZone.name.trim(),
+                          cost: newShippingZone.cost.trim(),
+                          regions: newShippingZone.regions.trim(),
+                        },
+                      ]);
+                      setNewShippingZone({ id: '', name: '', cost: '', regions: '' });
+                    }}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Existing shipping zones list */}
+            {shippingZones.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Defined Zones</h4>
+                <div className="space-y-2">
+                  {shippingZones.map((zone, index) => (
+                    <div
+                      key={zone.id + index.toString()}
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 border rounded"
+                    >
+                      <div className="text-xs sm:text-sm space-y-1">
+                        <div className="flex flex-wrap gap-2 items-center">
+                          <span className="font-mono">{zone.id}</span>
+                          {zone.name && <span className="text-muted-foreground">{zone.name}</span>}
+                        </div>
+                        <div className="text-muted-foreground">
+                          Cost: {zone.cost || '0'} ({watchedCurrency || 'USD'})
+                        </div>
+                        {zone.regions && (
+                          <div className="text-muted-foreground">Regions: {zone.regions}</div>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setShippingZones(shippingZones.filter((_, i) => i !== index))
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <Separator />

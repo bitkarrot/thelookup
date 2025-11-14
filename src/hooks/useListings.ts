@@ -18,6 +18,7 @@ export interface BusinessStallInfo {
   description?: string;
   currency: string;
   shipping: StallShippingZone[];
+  image?: string;
   tags: string[]; // t-tags for categories
   createdAt: number;
   dTag: string;
@@ -70,6 +71,31 @@ function parseStallEvent(event: NostrEvent): BusinessStallInfo {
     .filter(([name]) => name === 't')
     .map(([, tag]) => tag);
 
+  // Derive image from multiple possible patterns:
+  // 1) image tag
+  let image: string | undefined;
+  const imageTag = event.tags.find(([name]) => name === 'image')?.[1];
+  if (imageTag) {
+    image = imageTag;
+  }
+
+  // 2) content-level image/picture field if present
+  const contentWithImage = content as { image?: string; picture?: string };
+  if (!image && typeof contentWithImage.image === 'string') {
+    image = contentWithImage.image;
+  }
+  if (!image && typeof contentWithImage.picture === 'string') {
+    image = contentWithImage.picture;
+  }
+
+  // 3) content is a bare URL string (non-JSON)
+  if (!image && event.content && !event.content.trim().startsWith('{')) {
+    const trimmed = event.content.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      image = trimmed;
+    }
+  }
+
   return {
     id: event.id,
     pubkey: event.pubkey,
@@ -78,6 +104,7 @@ function parseStallEvent(event: NostrEvent): BusinessStallInfo {
     description: content.description,
     currency: content.currency ?? '',
     shipping: content.shipping ?? [],
+     image,
     tags,
     createdAt: event.created_at,
     dTag,
