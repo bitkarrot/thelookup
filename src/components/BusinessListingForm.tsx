@@ -15,6 +15,7 @@ import { TagInput } from '@/components/TagInput';
 import { ListingSubmissionPaymentDialog } from '@/components/ListingSubmissionPaymentDialog';
 import { Store, CreditCard } from 'lucide-react';
 import { useListingSubmissionPayment } from '@/hooks/useListingSubmissionPayment';
+import type { BusinessStallInfo } from '@/hooks/useListings';
 
 interface BusinessListingFormData {
   title: string;
@@ -22,14 +23,17 @@ interface BusinessListingFormData {
   description: string;
   image: string;
   location: string;
-  priceAmount: string;
-  priceCurrency: string;
-  priceFrequency: string;
-  status: string;
+  currency: string;
+  status: 'active' | 'draft';
   tags: string[];
 }
 
-export function BusinessListingForm() {
+interface BusinessListingFormProps {
+  existingStall?: BusinessStallInfo;
+  mode?: 'create' | 'edit';
+}
+
+export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: BusinessListingFormProps) {
   const { user } = useCurrentUser();
   const { mutate: publishEvent, isPending } = useNostrPublish();
   const { toast } = useToast();
@@ -48,7 +52,15 @@ export function BusinessListingForm() {
     regions: string;
   };
 
-  const [shippingZones, setShippingZones] = useState<ShippingZoneForm[]>([]);
+  const [shippingZones, setShippingZones] = useState<ShippingZoneForm[]>(() => {
+    if (!existingStall) return [];
+    return existingStall.shipping.map((zone) => ({
+      id: zone.id,
+      name: zone.name ?? '',
+      cost: zone.cost ? String(zone.cost) : '',
+      regions: zone.regions.join(', '),
+    }));
+  });
   const [newShippingZone, setNewShippingZone] = useState<ShippingZoneForm>({
     id: '',
     name: '',
@@ -65,21 +77,19 @@ export function BusinessListingForm() {
     formState: { errors },
   } = useForm<BusinessListingFormData>({
     defaultValues: {
-      title: '',
+      title: existingStall?.name ?? '',
       summary: '',
-      description: '',
+      description: existingStall?.description ?? '',
       image: '',
       location: '',
-      priceAmount: '',
-      priceCurrency: 'USD',
-      priceFrequency: '',
+      currency: existingStall?.currency ?? 'USD',
       status: 'active',
-      tags: [],
+      tags: existingStall?.tags ?? [],
     },
   });
 
   const watchedTags = watch('tags');
-  const watchedCurrency = watch('priceCurrency');
+  const watchedCurrency = watch('currency');
 
   const submitListingToRelay = (data: BusinessListingFormData) => {
     if (isSubmitting) {
@@ -89,7 +99,8 @@ export function BusinessListingForm() {
     setIsSubmitting(true);
 
     // Generate a stall id and ensure d-tag matches it per NIP-15
-    const stallId = Math.random().toString(36).substring(2, 15);
+    // For edits, reuse the existing stall id so the new event replaces the old one.
+    const stallId = existingStall?.stallId ?? Math.random().toString(36).substring(2, 15);
 
     const tags: string[][] = [
       ['d', stallId],
@@ -114,8 +125,11 @@ export function BusinessListingForm() {
       id: stallId,
       name: data.title.trim(),
       description: data.description.trim() || undefined,
-      currency: (data.priceCurrency || 'USD').trim() || 'USD',
+      currency: (data.currency || 'USD').trim() || 'USD',
       shipping: parsedShipping,
+      image: data.image.trim() || undefined,
+      location: data.location.trim() || undefined,
+      status: data.status,
     };
 
     const content = JSON.stringify(stallContent);
@@ -293,39 +307,14 @@ export function BusinessListingForm() {
                 placeholder="City, Country or Region"
               />
             </div>
-          </div>
 
-          <Separator />
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Pricing</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="priceAmount">Amount</Label>
-                <Input
-                  id="priceAmount"
-                  {...register('priceAmount')}
-                  placeholder="e.g., 50"
-                  type="number"
-                  min="0"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="priceCurrency">Currency</Label>
-                <Input
-                  id="priceCurrency"
-                  {...register('priceCurrency')}
-                  placeholder="e.g., USD"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="priceFrequency">Frequency</Label>
-                <Input
-                  id="priceFrequency"
-                  {...register('priceFrequency')}
-                  placeholder="e.g., month, year (optional)"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency">Currency</Label>
+              <Input
+                id="currency"
+                {...register('currency')}
+                placeholder="e.g., USD"
+              />
             </div>
           </div>
 
@@ -446,11 +435,14 @@ export function BusinessListingForm() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Input
+              <select
                 id="status"
                 {...register('status')}
-                placeholder="active or sold"
-              />
+                className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+              </select>
             </div>
 
             <TagInput

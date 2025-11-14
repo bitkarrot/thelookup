@@ -169,57 +169,68 @@ export default function ListingsPage() {
                 {viewMode === 'cards' ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6">
                     {filteredListings.map((listing) => (
-                      <Card key={listing.id} className="h-full flex flex-col sm:rounded-lg rounded-none">
-                        <CardHeader>
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10">
-                              {listing.image && (
-                                <AvatarImage src={listing.image} alt={listing.name} />
-                              )}
-                              <AvatarFallback>
-                                {listing.name.slice(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <CardTitle className="text-lg truncate">{listing.name}</CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          {listing.description && (
-                            <p className="text-sm text-muted-foreground line-clamp-3">
-                              {listing.description}
-                            </p>
-                          )}
-                          {listing.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {listing.tags.slice(0, 4).map((tag) => (
-                                <Badge key={tag} variant="outline" className="text-xs">
-                                  {tag}
-                                </Badge>
-                              ))}
+                      <Link
+                        key={listing.id}
+                        to={`/listings/${encodeURIComponent(listing.stallId)}`}
+                        className="block hover:no-underline"
+                      >
+                        <Card className="h-full flex flex-col sm:rounded-lg rounded-none hover:border-primary/50 transition-colors">
+                          <CardHeader>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10">
+                                {listing.image && (
+                                  <AvatarImage src={listing.image} alt={listing.name} />
+                                )}
+                                <AvatarFallback>
+                                  {listing.name.slice(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <CardTitle className="text-lg truncate">{listing.name}</CardTitle>
                             </div>
-                          )}
-                        </CardContent>
-                      </Card>
+                          </CardHeader>
+                          <CardContent className="space-y-2">
+                            {listing.description && (
+                              <p className="text-sm text-muted-foreground line-clamp-3">
+                                {listing.description}
+                              </p>
+                            )}
+                            {listing.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {listing.tags.slice(0, 4).map((tag) => (
+                                  <Badge key={tag} variant="outline" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </Link>
                     ))}
                   </div>
                 ) : (
                   <Card className="sm:rounded-lg rounded-none mt-6">
                     <div className="divide-y">
                       {filteredListings.map((listing) => (
-                        <div key={listing.id} className="p-4 flex flex-col gap-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <Avatar className="h-8 w-8 flex-shrink-0">
-                                {listing.image && (
-                                  <AvatarImage src={listing.image} alt={listing.name} />
-                                )}
-                                <AvatarFallback className="text-xs">
-                                  {listing.name.slice(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                              <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
+                        <Link
+                          key={listing.id}
+                          to={`/listings/${encodeURIComponent(listing.stallId)}`}
+                          className="block hover:bg-accent/60 transition-colors"
+                        >
+                          <div className="p-4 flex flex-col gap-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <Avatar className="h-8 w-8 flex-shrink-0">
+                                  {listing.image && (
+                                    <AvatarImage src={listing.image} alt={listing.name} />
+                                  )}
+                                  <AvatarFallback className="text-xs">
+                                    {listing.name.slice(0, 2).toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
+                              </div>
                             </div>
-                          </div>
                           {listing.description && (
                             <p className="text-sm text-muted-foreground line-clamp-2">
                               {listing.description}
@@ -237,7 +248,8 @@ export default function ListingsPage() {
                               </div>
                             )}
                           </div>
-                        </div>
+                          </div>
+                        </Link>
                       ))}
                     </div>
                   </Card>

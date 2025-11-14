@@ -15,6 +15,8 @@ import SubmitAppPage from "./pages/SubmitAppPage";
 import EditAppPage from "./pages/EditAppPage";
 import ListingsPage from "./pages/ListingsPage";
 import SubmitListingPage from "./pages/SubmitListingPage";
+import ListingDetailPage from "./pages/ListingDetailPage";
+import EditListingPage from "./pages/EditListingPage";
 import RepositoriesPage from "./pages/RepositoriesPage";
 import AnnounceRepositoryPage from "./pages/AnnounceRepositoryPage";
 import EditRepositoryPage from "./pages/EditRepositoryPage";
@@ -45,6 +47,8 @@ export function AppRouter() {
         <Route path="/apps/edit/:naddr" element={<EditAppPage />} />
         <Route path="/listings" element={<ListingsPage />} />
         <Route path="/listings/submit" element={<SubmitListingPage />} />
+        <Route path="/listings/:stallId" element={<ListingDetailPage />} />
+        <Route path="/listings/:stallId/edit" element={<EditListingPage />} />
         <Route path="/repositories" element={<RepositoriesPage />} />
         <Route path="/repositories/create" element={<AnnounceRepositoryPage />} />
         <Route path="/repositories/:naddr/edit" element={<EditRepositoryPage />} />
