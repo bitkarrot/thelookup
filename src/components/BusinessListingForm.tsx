@@ -456,8 +456,9 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
                     >
                       <div className="text-xs sm:text-sm space-y-1">
                         <div className="flex flex-wrap gap-2 items-center">
-                          <span className="font-mono">{zone.id}</span>
-                          {zone.name && <span className="text-muted-foreground">{zone.name}</span>}
+                          <span className="text-muted-foreground font-medium">
+                            {zone.name || zone.id}
+                          </span>
                         </div>
                         <div className="text-muted-foreground">
                           Cost: {zone.cost || '0'} ({watchedCurrency || 'USD'})
