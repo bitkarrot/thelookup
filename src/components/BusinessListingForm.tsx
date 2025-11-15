@@ -337,19 +337,24 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="stallId">
-                Stall ID <span className="text-xs text-yellow-600 dark:text-yellow-400">(Edit Stall ID at your own risk.)</span>
-              </Label>
-              <Input
-                id="stallId"
-                {...register('stallId')}
-                placeholder="auto-generated if left blank"
-              />
-              <p className="text-xs text-muted-foreground">
-                This identifier is used in the stall URL and the NIP-15 <code>d</code>-tag.
-              </p>
-            </div>
+            {existingStall && (
+              <div className="space-y-2">
+                <Label htmlFor="stallId">
+                  Stall ID{' '}
+                  <span className="text-xs text-yellow-600 dark:text-yellow-400">
+                    (Edit Stall ID at your own risk.)
+                  </span>
+                </Label>
+                <Input
+                  id="stallId"
+                  {...register('stallId')}
+                  placeholder="auto-generated if left blank"
+                />
+                <p className="text-xs text-muted-foreground">
+                  This identifier is used in the stall URL and the NIP-15 <code>d</code>-tag.
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
