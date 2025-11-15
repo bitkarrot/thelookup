@@ -20,6 +20,28 @@ import { RelaySelector } from '@/components/RelaySelector';
 import { ListingFlagDialog } from '@/components/ListingFlagDialog';
 import { FlagStats } from '@/components/FlagStats';
 
+function renderDescription(text: string) {
+  const parts = text.split(/(https?:\/\/[^\s]+)/g);
+
+  return parts.map((part, index) => {
+    if (/^https?:\/\//.test(part)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 text-primary break-words"
+        >
+          {part}
+        </a>
+      );
+    }
+
+    return <span key={index}>{part}</span>;
+  });
+}
+
 export default function ListingDetailPage() {
   const { stallId } = useParams<{ stallId: string }>();
   const { data: listings, isLoading, error } = useListings();
@@ -112,7 +134,7 @@ export default function ListingDetailPage() {
                       </CardTitle>
                       {listing.description && (
                         <p className="text-muted-foreground leading-relaxed">
-                          {listing.description}
+                          {renderDescription(listing.description)}
                         </p>
                       )}
                       <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
