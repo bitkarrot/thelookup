@@ -18,6 +18,7 @@ import { useListingSubmissionPayment } from '@/hooks/useListingSubmissionPayment
 import type { BusinessStallInfo } from '@/hooks/useListings';
 
 interface BusinessListingFormData {
+  stallId?: string;
   title: string;
   description: string;
   image: string;
@@ -81,6 +82,7 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
     formState: { errors },
   } = useForm<BusinessListingFormData>({
     defaultValues: {
+      stallId: existingStall?.stallId ?? '',
       title: existingStall?.name ?? '',
       description: existingStall?.description ?? '',
       image: existingStall?.image ?? '',
@@ -103,8 +105,14 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
     setIsSubmitting(true);
 
     // Generate a stall id and ensure d-tag matches it per NIP-15
-    // For edits, reuse the existing stall id so the new event replaces the old one.
-    const stallId = existingStall?.stallId ?? Math.random().toString(36).substring(2, 15);
+    // Prefer the user-provided stall ID when present; otherwise:
+    // - For edits, reuse the existing stall id so the new event replaces the old one.
+    // - For new stalls, generate a random id.
+    const trimmedStallIdFromForm = data.stallId?.trim();
+    const stallId =
+      (trimmedStallIdFromForm && trimmedStallIdFromForm.length > 0
+        ? trimmedStallIdFromForm
+        : existingStall?.stallId) ?? Math.random().toString(36).substring(2, 15);
 
     const trimmedImage = data.image.trim();
     const trimmedWebsite = data.website.trim();
@@ -329,6 +337,20 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="stallId">
+                Stall ID <span className="text-xs text-yellow-600 dark:text-yellow-400">(Edit Stall ID at your own risk.)</span>
+              </Label>
+              <Input
+                id="stallId"
+                {...register('stallId')}
+                placeholder="auto-generated if left blank"
+              />
+              <p className="text-xs text-muted-foreground">
+                This identifier is used in the stall URL and the NIP-15 <code>d</code>-tag.
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
               <Input
