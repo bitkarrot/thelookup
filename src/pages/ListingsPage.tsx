@@ -82,7 +82,7 @@ export default function ListingsPage() {
               <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Business Directory</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover businesses and marketplace stalls (NIP-15 kind 30017) published on the Nostr network.
+              Discover businesses and marketplace stalls published on the Nostr network.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
