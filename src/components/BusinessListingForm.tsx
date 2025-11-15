@@ -96,6 +96,7 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
 
   const watchedTags = watch('tags');
   const watchedCurrency = watch('currency');
+  const watchedImage = watch('image');
 
   const submitListingToRelay = (data: BusinessListingFormData) => {
     if (isSubmitting) {
@@ -383,12 +384,27 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
 
             <div className="space-y-2">
               <Label htmlFor="image">Image URL</Label>
+              <p className="text-xs text-muted-foreground">
+                An image (or video thumbnail) of around 1500x500 and under 2&nbsp;MB is recommended.
+              </p>
               <Input
                 id="image"
                 {...register('image')}
-                placeholder="https://example.com/image.png"
+                placeholder="https://example.com/header.png"
                 type="url"
               />
+              {watchedImage?.trim() && (
+                <div className="mt-3 border rounded-md bg-muted/40 overflow-hidden">
+                  <div className="w-full" style={{ aspectRatio: '3 / 1' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={watchedImage}
+                      alt="Listing header preview"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
