@@ -116,6 +116,20 @@ export default function ListingDetailPage() {
 
         {!isLoading && !error && listing && (
           <div className="space-y-6">
+            {listing.image && (
+              <div className="-mx-4 sm:mx-0 -mb-6">
+                <div className="border border-border/50 rounded-none sm:rounded-lg overflow-hidden bg-muted/40">
+                  <div className="w-full" style={{ aspectRatio: '3 / 1' }}>
+                    <img
+                      src={listing.image}
+                      alt={listing.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             <Card className="sm:rounded-lg rounded-none">
               <CardHeader>
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
