@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Store, ArrowLeft, Calendar, Edit } from 'lucide-react';
+import { Store, ArrowLeft, Calendar, Edit, ExternalLink } from 'lucide-react';
 import { RelaySelector } from '@/components/RelaySelector';
 
 export default function ListingDetailPage() {
@@ -120,6 +120,20 @@ export default function ListingDetailPage() {
                   </div>
 
                   <div className="flex flex-col items-end gap-2">
+                    {listing.website && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
+                        onClick={() => {
+                          window.open(listing.website as string, '_blank', 'noopener,noreferrer');
+                        }}
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Open Website
+                      </Button>
+                    )}
+
                     <Button
                       type="button"
                       variant="outline"

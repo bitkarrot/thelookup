@@ -19,6 +19,7 @@ export interface BusinessStallInfo {
   currency: string;
   shipping: StallShippingZone[];
   image?: string;
+  website?: string;
   tags: string[]; // t-tags for categories
   createdAt: number;
   dTag: string;
@@ -46,7 +47,6 @@ function validateStallEvent(event: NostrEvent): boolean {
   } catch {
     return false;
   }
-
   return true;
 }
 
@@ -59,6 +59,7 @@ function parseStallEvent(event: NostrEvent): BusinessStallInfo {
     description?: string;
     currency?: string;
     shipping?: StallShippingZone[];
+    website?: string;
   } = {};
 
   try {
@@ -96,6 +97,18 @@ function parseStallEvent(event: NostrEvent): BusinessStallInfo {
     }
   }
 
+  // Derive website from content or tags
+  let website: string | undefined;
+  if (content.website && typeof content.website === 'string') {
+    website = content.website;
+  }
+  if (!website) {
+    const websiteTag = event.tags.find(([name]) => name === 'website')?.[1];
+    if (websiteTag) {
+      website = websiteTag;
+    }
+  }
+
   return {
     id: event.id,
     pubkey: event.pubkey,
@@ -104,7 +117,8 @@ function parseStallEvent(event: NostrEvent): BusinessStallInfo {
     description: content.description,
     currency: content.currency ?? '',
     shipping: content.shipping ?? [],
-     image,
+    image,
+    website,
     tags,
     createdAt: event.created_at,
     dTag,

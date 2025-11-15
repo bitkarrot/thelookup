@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Search, Store, Plus, Grid3x3, List } from 'lucide-react';
+import { Search, Store, Plus, Grid3x3, List, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
@@ -206,7 +206,22 @@ export default function ListingsPage() {
                                 ))}
                               </div>
                             )}
-                            <div className="pt-3 flex gap-2">
+                            <div className="pt-3 flex flex-wrap gap-2">
+                              {listing.website && (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  className="h-8 px-3 text-xs sm:text-sm bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    window.open(listing.website as string, '_blank', 'noopener,noreferrer');
+                                  }}
+                                >
+                                  <ExternalLink className="h-4 w-4 mr-1" />
+                                  Open
+                                </Button>
+                              )}
                               <Button
                                 type="button"
                                 variant="outline"
@@ -264,6 +279,21 @@ export default function ListingsPage() {
                                 <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
                               </div>
                               <div className="flex items-center gap-2">
+                                {listing.website && (
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    className="h-8 px-3 text-[10px] sm:text-xs bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      window.open(listing.website as string, '_blank', 'noopener,noreferrer');
+                                    }}
+                                  >
+                                    <ExternalLink className="h-3 w-3 mr-1" />
+                                    Open
+                                  </Button>
+                                )}
                                 <Button
                                   type="button"
                                   variant="outline"

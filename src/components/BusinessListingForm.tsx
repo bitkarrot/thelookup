@@ -21,6 +21,7 @@ interface BusinessListingFormData {
   title: string;
   description: string;
   image: string;
+  website: string;
   location: string;
   currency: string;
   status: 'active' | 'draft';
@@ -68,6 +69,9 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
     regions: '',
   });
 
+  const existingWebsite =
+    existingStall?.event.tags.find(([name]) => name === 'website')?.[1] ?? '';
+
   const {
     register,
     handleSubmit,
@@ -80,6 +84,7 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
       title: existingStall?.name ?? '',
       description: existingStall?.description ?? '',
       image: existingStall?.image ?? '',
+      website: existingWebsite,
       location: '',
       currency: existingStall?.currency ?? 'USD',
       status: 'active',
@@ -102,31 +107,36 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
     const stallId = existingStall?.stallId ?? Math.random().toString(36).substring(2, 15);
 
     const trimmedImage = data.image.trim();
+    const trimmedWebsite = data.website.trim();
 
     let tags: string[][];
 
     if (existingStall) {
-      // Start from existing tags and preserve non-d/t/image tags (e.g. g tags)
+      // Start from existing tags and preserve non-d/t/image/website tags (e.g. g tags)
       const preservedTags = existingStall.event.tags.filter(
-        ([name]) => name !== 'd' && name !== 't' && name !== 'image',
+        ([name]) => name !== 'd' && name !== 't' && name !== 'image' && name !== 'website',
       );
 
       const imageTags: string[][] = trimmedImage ? [['image', trimmedImage]] : [];
+      const websiteTags: string[][] = trimmedWebsite ? [['website', trimmedWebsite]] : [];
 
       tags = [
         ['d', stallId],
         ...preservedTags,
         ...imageTags,
+        ...websiteTags,
         // Use t-tags as categories for the stall
         ...data.tags.map((tag) => ['t', tag]),
       ];
     } else {
       // New stall: build tags from scratch
       const imageTags: string[][] = trimmedImage ? [['image', trimmedImage]] : [];
+      const websiteTags: string[][] = trimmedWebsite ? [['website', trimmedWebsite]] : [];
 
       tags = [
         ['d', stallId],
         ...imageTags,
+        ...websiteTags,
         // Use t-tags as categories for the stall
         ...data.tags.map((tag) => ['t', tag]),
       ];
@@ -153,6 +163,7 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
       currency?: string;
       shipping?: unknown;
       image?: string;
+      website?: string;
       location?: string;
       status?: string;
       // Allow arbitrary extra keys from other clients
@@ -178,6 +189,7 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
       description: data.description.trim() || undefined,
       currency: (data.currency || 'USD').trim() || 'USD',
       image: data.image.trim() || undefined,
+      website: data.website.trim() || undefined,
       location: data.location.trim() || undefined,
       status: data.status,
     };
@@ -348,6 +360,16 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
                 id="image"
                 {...register('image')}
                 placeholder="https://example.com/image.png"
+                type="url"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="website">Website URL</Label>
+              <Input
+                id="website"
+                {...register('website')}
+                placeholder="https://example.com"
                 type="url"
               />
             </div>
