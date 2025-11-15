@@ -51,15 +51,16 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
     regions: string;
   };
 
-  const [shippingZones, setShippingZones] = useState<ShippingZoneForm[]>(() => {
-    if (!existingStall) return [];
-    return existingStall.shipping.map((zone) => ({
-      id: zone.id,
-      name: zone.name ?? '',
-      cost: zone.cost ? String(zone.cost) : '',
-      regions: Array.isArray(zone.regions) ? zone.regions.join(', ') : '',
-    }));
-  });
+  const initialShippingZones: ShippingZoneForm[] = existingStall
+    ? existingStall.shipping.map((zone) => ({
+        id: zone.id,
+        name: zone.name ?? '',
+        cost: zone.cost ? String(zone.cost) : '',
+        regions: Array.isArray(zone.regions) ? zone.regions.join(', ') : '',
+      }))
+    : [];
+
+  const [shippingZones, setShippingZones] = useState<ShippingZoneForm[]>(initialShippingZones);
   const [newShippingZone, setNewShippingZone] = useState<ShippingZoneForm>({
     id: '',
     name: '',
@@ -144,16 +145,51 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
           .filter(Boolean),
       }));
 
-    const stallContent = {
+    // Start from original JSON content for edits so we don't drop unknown fields
+    type StallContent = {
+      id?: string;
+      name?: string;
+      description?: string;
+      currency?: string;
+      shipping?: unknown;
+      image?: string;
+      location?: string;
+      status?: string;
+      // Allow arbitrary extra keys from other clients
+      [key: string]: unknown;
+    };
+
+    let baseContent: StallContent = {};
+    if (existingStall) {
+      try {
+        baseContent = JSON.parse(existingStall.event.content || '{}');
+      } catch {
+        baseContent = {};
+      }
+    }
+
+    const shippingUnchanged =
+      existingStall && JSON.stringify(shippingZones) === JSON.stringify(initialShippingZones);
+
+    const stallContent: StallContent = {
+      ...(existingStall ? baseContent : {}),
       id: stallId,
       name: data.title.trim(),
       description: data.description.trim() || undefined,
       currency: (data.currency || 'USD').trim() || 'USD',
-      shipping: parsedShipping,
       image: data.image.trim() || undefined,
       location: data.location.trim() || undefined,
       status: data.status,
     };
+
+    if (existingStall) {
+      if (!shippingUnchanged) {
+        stallContent.shipping = parsedShipping;
+      }
+      // if shipping is unchanged, leave baseContent.shipping as-is to preserve countries/other fields
+    } else {
+      stallContent.shipping = parsedShipping;
+    }
 
     const content = JSON.stringify(stallContent);
 
