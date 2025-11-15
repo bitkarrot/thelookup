@@ -4,6 +4,7 @@ import { Layout } from '@/components/Layout';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { useListings } from '@/hooks/useListings';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useListingFlags } from '@/hooks/useListingFlags';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,8 +15,10 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Store, ArrowLeft, Calendar, Edit, ExternalLink } from 'lucide-react';
+import { Store, ArrowLeft, Calendar, Edit, ExternalLink, AlertTriangle } from 'lucide-react';
 import { RelaySelector } from '@/components/RelaySelector';
+import { ListingFlagDialog } from '@/components/ListingFlagDialog';
+import { FlagStats } from '@/components/FlagStats';
 
 export default function ListingDetailPage() {
   const { stallId } = useParams<{ stallId: string }>();
@@ -29,6 +32,12 @@ export default function ListingDetailPage() {
       const dTagLower = item.dTag.toLowerCase();
       return stallIdLower === normalizedParam || dTagLower === normalizedParam;
     }) || null;
+
+  const { flagStats, canFlag, userFlag } = useListingFlags(
+    listing?.id || '',
+    listing?.pubkey || '',
+    listing?.dTag || '',
+  );
 
   useSeoMeta({
     title: getPageTitle(listing ? listing.name : 'Business Listing'),
@@ -97,7 +106,7 @@ export default function ListingDetailPage() {
                         {listing.name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-1">
                       <CardTitle className="text-2xl font-bold leading-tight">
                         {listing.name}
                       </CardTitle>
@@ -115,6 +124,20 @@ export default function ListingDetailPage() {
                           <Store className="h-4 w-4" />
                           Stall ID: <span className="font-mono text-xs">{listing.stallId}</span>
                         </span>
+                      </div>
+
+                      <div className="mt-3">
+                        <ListingFlagDialog listing={listing}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={!canFlag}
+                            className="text-xs border-yellow-500 text-yellow-600 hover:bg-yellow-50 hover:text-yellow-700 hover:border-yellow-600 dark:text-yellow-500 dark:border-yellow-600 dark:hover:bg-yellow-950 dark:hover:text-yellow-400 dark:hover:border-yellow-500"
+                          >
+                            <AlertTriangle className="h-3 w-3 mr-1" />
+                            {userFlag ? 'Flagged' : 'Flag'}
+                          </Button>
+                        </ListingFlagDialog>
                       </div>
                     </div>
                   </div>
@@ -165,6 +188,23 @@ export default function ListingDetailPage() {
             </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {flagStats.total > 0 && (
+                <Card className="lg:col-span-3 sm:rounded-lg rounded-none border-yellow-200 bg-yellow-50/50">
+                  <CardContent className="py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                        <span className="font-medium text-yellow-800">
+                          This listing has been flagged {flagStats.total}{' '}
+                          {flagStats.total === 1 ? 'time' : 'times'}
+                        </span>
+                      </div>
+                      <FlagStats flagStats={flagStats} canFlag={canFlag} />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               <Card className="lg:col-span-2 sm:rounded-lg rounded-none">
                 <CardHeader>
                   <CardTitle>Nostr Data</CardTitle>
