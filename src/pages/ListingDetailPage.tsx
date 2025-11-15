@@ -6,6 +6,12 @@ import { useListings } from '@/hooks/useListings';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Store, ArrowLeft, Calendar, Edit } from 'lucide-react';
@@ -128,7 +134,7 @@ export default function ListingDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card className="lg:col-span-2 sm:rounded-lg rounded-none">
                 <CardHeader>
-                  <CardTitle>Business Details</CardTitle>
+                  <CardTitle>Nostr Data</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between text-sm">
@@ -149,12 +155,36 @@ export default function ListingDetailPage() {
                     </div>
                   )}
 
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-medium">Raw Stall Info</h3>
-                    <pre className="bg-muted text-xs p-3 rounded-md overflow-x-auto">
-                      <code>{JSON.stringify(listing.event, null, 2)}</code>
-                    </pre>
-                  </div>
+                  <Accordion type="single" collapsible className="border rounded-md">
+                    <AccordionItem value="raw-stall-info">
+                      <AccordionTrigger className="px-3 text-sm font-medium">
+                        Raw Stall Info
+                      </AccordionTrigger>
+                      <AccordionContent className="px-3 pb-3 pt-0 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs text-muted-foreground">Event JSON</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const json = JSON.stringify(listing.event, null, 2);
+                              if (navigator.clipboard?.writeText) {
+                                navigator.clipboard.writeText(json).catch(() => {
+                                  // silent failure – no UI toast system imported here
+                                });
+                              }
+                            }}
+                          >
+                            Copy JSON
+                          </Button>
+                        </div>
+                        <pre className="bg-muted text-xs p-3 rounded-md overflow-x-auto">
+                          <code>{JSON.stringify(listing.event, null, 2)}</code>
+                        </pre>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </CardContent>
               </Card>
 
