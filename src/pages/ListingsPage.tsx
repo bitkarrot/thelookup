@@ -2,6 +2,7 @@ import { useSeoMeta } from '@unhead/react';
 import { useState, useMemo } from 'react';
 import { Layout } from '@/components/Layout';
 import { useListings } from '@/hooks/useListings';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Search, Store, Plus, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 
 export default function ListingsPage() {
@@ -20,9 +21,11 @@ export default function ListingsPage() {
   });
 
   const { data: listings, isLoading, error } = useListings();
+  const { user } = useCurrentUser();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'cards' | 'list'>('list');
+  const [viewMode, setViewMode] = useState<'cards' | 'list'>('cards');
 
   const allTags = useMemo(() => {
     const tags = listings?.flatMap((listing) => listing.tags || []) || [];
@@ -203,6 +206,36 @@ export default function ListingsPage() {
                                 ))}
                               </div>
                             )}
+                            <div className="pt-3 flex gap-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-3 text-xs sm:text-sm"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  navigate(`/listings/${encodeURIComponent(listing.stallId)}`);
+                                }}
+                              >
+                                Details
+                              </Button>
+                              {user?.pubkey === listing.pubkey && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-8 px-3 text-xs sm:text-sm"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    navigate(`/listings/${encodeURIComponent(listing.stallId)}/edit`);
+                                  }}
+                                >
+                                  Edit Listing
+                                </Button>
+                              )}
+                            </div>
                           </CardContent>
                         </Card>
                       </Link>
@@ -229,6 +262,36 @@ export default function ListingsPage() {
                                   </AvatarFallback>
                                 </Avatar>
                                 <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-8 px-3 text-[10px] sm:text-xs"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    navigate(`/listings/${encodeURIComponent(listing.stallId)}`);
+                                  }}
+                                >
+                                  Details
+                                </Button>
+                                {user?.pubkey === listing.pubkey && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 px-3 text-[10px] sm:text-xs"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      navigate(`/listings/${encodeURIComponent(listing.stallId)}/edit`);
+                                    }}
+                                  >
+                                    Edit
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           {listing.description && (
