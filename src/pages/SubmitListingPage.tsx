@@ -16,7 +16,7 @@ export default function SubmitListingPage() {
   useSeoMeta({
     title: getPageTitle('Submit Listing'),
     description: getPageDescription(
-      'Submit a business listing to the directory as a NIP-99 classified listing.',
+      'Submit a business listing to the directory as a NIP-15 marketplace stall (kind 30017).',
     ),
   });
 
@@ -40,8 +40,8 @@ export default function SubmitListingPage() {
                 <h3 className="font-medium text-blue-900 dark:text-blue-100">About Listings</h3>
                 <div className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
                   <p>
-                    When you submit a listing, you're creating a <strong>NIP-99 classified listing</strong> event
-                    (kind 30402) that describes a product, service, or other offer.
+                    When you submit a listing, you're creating a <strong>NIP-15 marketplace stall</strong> event
+                    (kind 30017) that describes a business and its offerings.
                   </p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Your listing will be discoverable by users browsing the directory</li>
