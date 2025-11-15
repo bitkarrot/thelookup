@@ -19,7 +19,6 @@ import type { BusinessStallInfo } from '@/hooks/useListings';
 
 interface BusinessListingFormData {
   title: string;
-  summary: string;
   description: string;
   image: string;
   location: string;
@@ -58,7 +57,7 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
       id: zone.id,
       name: zone.name ?? '',
       cost: zone.cost ? String(zone.cost) : '',
-      regions: zone.regions.join(', '),
+      regions: Array.isArray(zone.regions) ? zone.regions.join(', ') : '',
     }));
   });
   const [newShippingZone, setNewShippingZone] = useState<ShippingZoneForm>({
@@ -78,9 +77,8 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
   } = useForm<BusinessListingFormData>({
     defaultValues: {
       title: existingStall?.name ?? '',
-      summary: '',
       description: existingStall?.description ?? '',
-      image: '',
+      image: existingStall?.image ?? '',
       location: '',
       currency: existingStall?.currency ?? 'USD',
       status: 'active',
@@ -102,11 +100,36 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
     // For edits, reuse the existing stall id so the new event replaces the old one.
     const stallId = existingStall?.stallId ?? Math.random().toString(36).substring(2, 15);
 
-    const tags: string[][] = [
-      ['d', stallId],
-      // Use t-tags as categories for the stall
-      ...data.tags.map((tag) => ['t', tag]),
-    ];
+    const trimmedImage = data.image.trim();
+
+    let tags: string[][];
+
+    if (existingStall) {
+      // Start from existing tags and preserve non-d/t/image tags (e.g. g tags)
+      const preservedTags = existingStall.event.tags.filter(
+        ([name]) => name !== 'd' && name !== 't' && name !== 'image',
+      );
+
+      const imageTags: string[][] = trimmedImage ? [['image', trimmedImage]] : [];
+
+      tags = [
+        ['d', stallId],
+        ...preservedTags,
+        ...imageTags,
+        // Use t-tags as categories for the stall
+        ...data.tags.map((tag) => ['t', tag]),
+      ];
+    } else {
+      // New stall: build tags from scratch
+      const imageTags: string[][] = trimmedImage ? [['image', trimmedImage]] : [];
+
+      tags = [
+        ['d', stallId],
+        ...imageTags,
+        // Use t-tags as categories for the stall
+        ...data.tags.map((tag) => ['t', tag]),
+      ];
+    }
 
     // NIP-15 stall content
     const parsedShipping = shippingZones
@@ -192,7 +215,10 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
       return;
     }
 
-    if (isPaymentRequired && paymentConfig) {
+    // Only require payment for initial submissions, not edits
+    const shouldRequirePayment = !existingStall && isPaymentRequired && paymentConfig;
+
+    if (shouldRequirePayment) {
       setPendingFormData(data);
       setShowPaymentDialog(true);
       toast({
@@ -265,15 +291,6 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
               {errors.title && (
                 <p className="text-sm text-destructive">{errors.title.message}</p>
               )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="summary">Summary</Label>
-              <Input
-                id="summary"
-                {...register('summary')}
-                placeholder="Short tagline for your listing"
-              />
             </div>
 
             <div className="space-y-2">
@@ -463,7 +480,9 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
               className="min-w-32"
             >
               {isPending || isSubmitting ? (
-                'Submitting...'
+                existingStall ? 'Saving...' : 'Submitting...'
+              ) : existingStall ? (
+                'Save Changes'
               ) : isPaymentRequired ? (
                 <>
                   <CreditCard className="h-4 w-4 mr-2" />
