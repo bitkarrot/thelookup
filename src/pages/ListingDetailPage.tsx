@@ -3,6 +3,7 @@ import { useSeoMeta } from '@unhead/react';
 import { Layout } from '@/components/Layout';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { useListings } from '@/hooks/useListings';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,8 +14,15 @@ import { RelaySelector } from '@/components/RelaySelector';
 export default function ListingDetailPage() {
   const { stallId } = useParams<{ stallId: string }>();
   const { data: listings, isLoading, error } = useListings();
+  const { user } = useCurrentUser();
 
-  const listing = listings?.find((item) => item.stallId === stallId) || null;
+  const normalizedParam = stallId ? decodeURIComponent(stallId).toLowerCase() : '';
+  const listing =
+    listings?.find((item) => {
+      const stallIdLower = item.stallId.toLowerCase();
+      const dTagLower = item.dTag.toLowerCase();
+      return stallIdLower === normalizedParam || dTagLower === normalizedParam;
+    }) || null;
 
   useSeoMeta({
     title: getPageTitle(listing ? listing.name : 'Business Listing'),
@@ -105,12 +113,14 @@ export default function ListingDetailPage() {
                     </div>
                   </div>
 
-                  <Button variant="outline" asChild>
-                    <Link to={`/listings/${encodeURIComponent(listing.stallId)}/edit`}>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Listing
-                    </Link>
-                  </Button>
+                  {user?.pubkey === listing.pubkey && (
+                    <Button variant="outline" asChild>
+                      <Link to={`/listings/${encodeURIComponent(listing.stallId)}/edit`}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Listing
+                      </Link>
+                    </Button>
+                  )}
                 </div>
               </CardHeader>
             </Card>
@@ -162,13 +172,14 @@ export default function ListingDetailPage() {
                       {listing.shipping.map((zone) => (
                         <div key={zone.id} className="border rounded-md p-2 text-xs space-y-1">
                           <div className="flex justify-between">
-                            <span className="font-mono">{zone.id}</span>
-                            {zone.name && <span className="text-muted-foreground">{zone.name}</span>}
+                            <span className="text-muted-foreground font-medium">
+                              {zone.name || 'Shipping'}
+                            </span>
                           </div>
                           <div className="text-muted-foreground">
                             Cost: {zone.cost} ({listing.currency})
                           </div>
-                          {zone.regions.length > 0 && (
+                          {Array.isArray(zone.regions) && zone.regions.length > 0 && (
                             <div className="text-muted-foreground">
                               Regions: {zone.regions.join(', ')}
                             </div>

@@ -3,6 +3,7 @@ import { useSeoMeta } from '@unhead/react';
 import { Layout } from '@/components/Layout';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { useListings } from '@/hooks/useListings';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RelaySelector } from '@/components/RelaySelector';
 import { BusinessListingForm } from '@/components/BusinessListingForm';
@@ -10,8 +11,15 @@ import { BusinessListingForm } from '@/components/BusinessListingForm';
 export default function EditListingPage() {
   const { stallId } = useParams<{ stallId: string }>();
   const { data: listings, isLoading, error } = useListings();
+  const { user } = useCurrentUser();
 
-  const listing = listings?.find((item) => item.stallId === stallId) || null;
+  const normalizedParam = stallId ? decodeURIComponent(stallId).toLowerCase() : '';
+  const listing =
+    listings?.find((item) => {
+      const stallIdLower = item.stallId.toLowerCase();
+      const dTagLower = item.dTag.toLowerCase();
+      return stallIdLower === normalizedParam || dTagLower === normalizedParam;
+    }) || null;
 
   useSeoMeta({
     title: getPageTitle(listing ? `Edit ${listing.name}` : 'Edit Listing'),
@@ -54,10 +62,26 @@ export default function EditListingPage() {
     );
   }
 
+  const isOwner = user?.pubkey === listing.pubkey;
+
   return (
     <Layout>
       <div className="max-w-3xl mx-auto px-4 sm:px-0">
-        <BusinessListingForm existingStall={listing} mode="edit" />
+        {isOwner ? (
+          <BusinessListingForm existingStall={listing} mode="edit" />
+        ) : (
+          <Card className="sm:rounded-lg rounded-none">
+            <CardHeader>
+              <CardTitle>Edit Listing</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                You do not have permission to edit this listing. Only the creator can update it.
+              </p>
+              <RelaySelector className="w-full" />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </Layout>
   );
