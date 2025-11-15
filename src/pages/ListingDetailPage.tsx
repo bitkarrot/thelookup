@@ -119,14 +119,28 @@ export default function ListingDetailPage() {
                     </div>
                   </div>
 
-                  {user?.pubkey === listing.pubkey && (
-                    <Button variant="outline" asChild>
-                      <Link to={`/listings/${encodeURIComponent(listing.stallId)}/edit`}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit Listing
-                      </Link>
+                  <div className="flex flex-col items-end gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const url = `https://plebeian.market/community/${listing.pubkey}:${listing.stallId}`;
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                      }}
+                    >
+                      View on Plebeian Market
                     </Button>
-                  )}
+
+                    {user?.pubkey === listing.pubkey && (
+                      <Button variant="outline" asChild size="sm">
+                        <Link to={`/listings/${encodeURIComponent(listing.stallId)}/edit`}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Listing
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
             </Card>
