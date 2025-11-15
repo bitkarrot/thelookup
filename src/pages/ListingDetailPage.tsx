@@ -87,7 +87,7 @@ export default function ListingDetailPage() {
           <div className="space-y-6">
             <Card className="sm:rounded-lg rounded-none">
               <CardHeader>
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div className="flex items-start gap-4">
                     <Avatar className="h-16 w-16 border-2 border-primary/20">
                       {listing.image && (
@@ -119,12 +119,12 @@ export default function ListingDetailPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-end gap-2">
+                  <div className="flex flex-col md:items-end items-stretch gap-2 w-full md:w-auto">
                     {listing.website && (
                       <Button
                         type="button"
                         size="sm"
-                        className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
+                        className="w-full md:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
                         onClick={() => {
                           window.open(listing.website as string, '_blank', 'noopener,noreferrer');
                         }}
@@ -136,8 +136,8 @@ export default function ListingDetailPage() {
 
                     <Button
                       type="button"
-                      variant="outline"
                       size="sm"
+                      className="w-full md:w-auto bg-violet-600 hover:bg-violet-500 text-primary-foreground"
                       onClick={() => {
                         const url = `https://plebeian.market/community/${listing.pubkey}:${listing.stallId}`;
                         window.open(url, '_blank', 'noopener,noreferrer');
@@ -147,7 +147,12 @@ export default function ListingDetailPage() {
                     </Button>
 
                     {user?.pubkey === listing.pubkey && (
-                      <Button variant="outline" asChild size="sm">
+                      <Button
+                        variant="outline"
+                        asChild
+                        size="sm"
+                        className="w-full md:w-auto"
+                      >
                         <Link to={`/listings/${encodeURIComponent(listing.stallId)}/edit`}>
                           <Edit className="h-4 w-4 mr-2" />
                           Edit Listing
