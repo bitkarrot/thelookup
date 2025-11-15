@@ -235,21 +235,6 @@ export default function ListingsPage() {
                               >
                                 Details
                               </Button>
-                              {user?.pubkey === listing.pubkey && (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-8 px-3 text-xs sm:text-sm"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    navigate(`/listings/${encodeURIComponent(listing.stallId)}/edit`);
-                                  }}
-                                >
-                                  Edit Listing
-                                </Button>
-                              )}
                             </div>
                           </CardContent>
                         </Card>
@@ -307,21 +292,6 @@ export default function ListingsPage() {
                                 >
                                   Details
                                 </Button>
-                                {user?.pubkey === listing.pubkey && (
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 px-3 text-[10px] sm:text-xs"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      navigate(`/listings/${encodeURIComponent(listing.stallId)}/edit`);
-                                    }}
-                                  >
-                                    Edit
-                                  </Button>
-                                )}
                               </div>
                             </div>
                           {listing.description && (
