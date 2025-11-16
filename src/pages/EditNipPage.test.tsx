@@ -12,8 +12,8 @@ vi.mock('@/hooks/useCustomNip', () => ({
   useCustomNip: vi.fn(),
 }));
 
-vi.mock('@/hooks/useNostrPublish', () => ({
-  useNostrPublish: vi.fn(),
+vi.mock('@/hooks/useUpdateNip', () => ({
+  useUpdateNip: vi.fn(),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -27,11 +27,11 @@ vi.mock('react-router-dom', async () => {
 
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useCustomNip } from '@/hooks/useCustomNip';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
+import { useUpdateNip } from '@/hooks/useUpdateNip';
 
 const mockUseCurrentUser = useCurrentUser as ReturnType<typeof vi.fn>;
 const mockUseCustomNip = useCustomNip as ReturnType<typeof vi.fn>;
-const mockUseNostrPublish = useNostrPublish as ReturnType<typeof vi.fn>;
+const mockUseUpdateNip = useUpdateNip as ReturnType<typeof vi.fn>;
 
 describe('EditNipPage', () => {
   const mockUser = {
@@ -39,7 +39,7 @@ describe('EditNipPage', () => {
     signer: {},
   };
 
-  const mockPublishEvent = vi.fn();
+  const mockUpdateNip = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -48,8 +48,8 @@ describe('EditNipPage', () => {
       user: mockUser,
     });
 
-    mockUseNostrPublish.mockReturnValue({
-      mutate: mockPublishEvent,
+    mockUseUpdateNip.mockReturnValue({
+      mutate: mockUpdateNip,
       isPending: false,
     });
   });
@@ -95,18 +95,15 @@ describe('EditNipPage', () => {
     const submitButton = screen.getByRole('button', { name: /update nip/i });
     fireEvent.click(submitButton);
 
-    // Verify that the publish function was called with fork markers preserved
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
-        kind: 30817,
+    // Verify that the update hook was called with the correct payload
+    expect(mockUpdateNip).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identifier: 'forked-nip',
+        title: 'Updated Forked NIP',
         content: 'This is a forked NIP content.',
-        tags: [
-          ['d', 'forked-nip'],
-          ['title', 'Updated Forked NIP'],
-          ['k', '1'],
-          ['a', '30817:original-author:original-nip', '', 'fork'], // Fork marker preserved
-        ],
-      },
+        kinds: ['1'],
+        originalEvent: forkedEvent,
+      }),
       expect.any(Object)
     );
   });
@@ -152,18 +149,15 @@ describe('EditNipPage', () => {
     const submitButton = screen.getByRole('button', { name: /update nip/i });
     fireEvent.click(submitButton);
 
-    // Verify that the publish function was called with fork markers preserved
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
-        kind: 30817,
+    // Verify that the update hook was called with the correct payload
+    expect(mockUpdateNip).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identifier: 'forked-official-nip',
+        title: 'Forked Official NIP',
         content: 'Updated forked official NIP content.',
-        tags: [
-          ['d', 'forked-official-nip'],
-          ['title', 'Forked Official NIP'],
-          ['k', '42'],
-          ['i', 'https://github.com/nostr-protocol/nips/blob/master/01.md', 'fork'], // Fork marker preserved
-        ],
-      },
+        kinds: ['42'],
+        originalEvent: forkedEvent,
+      }),
       expect.any(Object)
     );
   });
@@ -207,20 +201,15 @@ describe('EditNipPage', () => {
     const submitButton = screen.getByRole('button', { name: /update nip/i });
     fireEvent.click(submitButton);
 
-    // Verify that both fork markers are preserved
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
-        kind: 30817,
+    // Verify that the update hook was called with the correct payload
+    expect(mockUpdateNip).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identifier: 'multi-forked-nip',
+        title: 'Multi-Forked NIP',
         content: 'This NIP is forked from multiple sources.',
-        tags: [
-          ['d', 'multi-forked-nip'],
-          ['title', 'Multi-Forked NIP'],
-          ['k', '1'],
-          ['k', '42'],
-          ['a', '30817:original-author:original-nip', '', 'fork'], // Both fork markers preserved
-          ['i', 'https://github.com/nostr-protocol/nips/blob/master/01.md', 'fork'],
-        ],
-      },
+        kinds: ['1', '42'],
+        originalEvent: eventWithMultipleForks,
+      }),
       expect.any(Object)
     );
   });
@@ -261,18 +250,15 @@ describe('EditNipPage', () => {
     const submitButton = screen.getByRole('button', { name: /update nip/i });
     fireEvent.click(submitButton);
 
-    // Verify that no fork markers are added
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
-        kind: 30817,
+    // Verify that the update hook was called with the correct payload
+    expect(mockUpdateNip).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identifier: 'regular-nip',
+        title: 'Regular NIP',
         content: 'This is a regular NIP content.',
-        tags: [
-          ['d', 'regular-nip'],
-          ['title', 'Regular NIP'],
-          ['k', '1'],
-          // No fork markers should be present
-        ],
-      },
+        kinds: ['1'],
+        originalEvent: regularEvent,
+      }),
       expect.any(Object)
     );
   });
@@ -316,18 +302,15 @@ describe('EditNipPage', () => {
     const submitButton = screen.getByRole('button', { name: /update nip/i });
     fireEvent.click(submitButton);
 
-    // Verify that only valid fork markers are preserved
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
-        kind: 30817,
+    // Verify that the update hook was called with the correct payload
+    expect(mockUpdateNip).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identifier: 'malformed-tags-nip',
+        title: 'NIP with Malformed Tags',
         content: 'This NIP has some malformed fork tags.',
-        tags: [
-          ['d', 'malformed-tags-nip'],
-          ['title', 'NIP with Malformed Tags'],
-          ['k', '1'],
-          ['a', '30817:valid-author:valid-nip', '', 'fork'], // Only valid fork marker preserved
-        ],
-      },
+        kinds: ['1'],
+        originalEvent: eventWithMalformedTags,
+      }),
       expect.any(Object)
     );
   });

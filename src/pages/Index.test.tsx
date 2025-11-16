@@ -385,15 +385,15 @@ describe('Index', () => {
     );
 
     // Find the kind badges in the official NIPs section
-    const kindBadges = screen.getAllByText('1').filter(el => 
+    const kindBadges = screen.getAllByText('1').filter(el =>
       el.classList.contains('cursor-pointer')
     );
-    
+
     expect(kindBadges.length).toBeGreaterThan(0);
-    
+
     // Verify the badge has the clickable styling
     const kindBadge = kindBadges[0];
     expect(kindBadge).toHaveClass('cursor-pointer');
-    expect(kindBadge).toHaveClass('hover:bg-primary/20');
+    expect(kindBadge).toHaveClass('hover:bg-purple-200');
   });
 });

@@ -594,15 +594,14 @@ function encodeLnurl(url: string): string {
 // Helper function to query a relay for zap receipts using WebSocket
 async function queryRelayForReceipts(relayUrl: string, queries: object[]): Promise<NostrEvent[]> {
   return new Promise((resolve, _reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const WebSocket = (window as any)?.WebSocket || (global as any)?.WebSocket;
-    if (!WebSocket) {
+    const WebSocketConstructor = typeof WebSocket !== 'undefined' ? WebSocket : null;
+    if (!WebSocketConstructor) {
       console.log(`WebSocket not available for ${relayUrl}`);
       resolve([]);
       return;
     }
 
-    const ws = new WebSocket(relayUrl);
+    const ws = new WebSocketConstructor(relayUrl);
     const subId = 'zap-receipt-' + Math.random().toString(36).substring(7);
     const allReceipts: NostrEvent[] = [];
     let queryCount = 0;

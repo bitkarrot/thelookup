@@ -1,6 +1,4 @@
 import { Zap } from 'lucide-react';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useAuthor } from '@/hooks/useAuthor';
 import { cn } from '@/lib/utils';
 import { ZapDialog } from '@/components/ZapDialog';
 import type { Event } from 'nostr-tools';
@@ -20,13 +18,10 @@ export function ZapButton({
   eventId,
   eventCoordinate,
   className,
-  variant = 'outline',
+  variant: _variant = 'outline',
   size = 'sm',
   showLabel = true,
 }: ZapButtonProps) {
-  const { user } = useCurrentUser();
-  const { data: author } = useAuthor(recipientPubkey);
-
   // Create a minimal Event object for ZapDialog
   // For addressable events (when eventCoordinate exists), use kind 30000 and proper tags
   const targetEvent: Event = {

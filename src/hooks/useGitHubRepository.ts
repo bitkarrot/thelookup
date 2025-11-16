@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 export interface GitHubFileEntry {
   name: string;
@@ -12,25 +12,12 @@ export interface GitHubFileEntry {
   download_url?: string;
 }
 
-export interface GitHubRepositoryState {
-  isLoading: boolean;
-  isLoaded: boolean;
-  error: string | null;
-}
-
 interface GitHubApiError {
   message: string;
   documentation_url?: string;
 }
 
 export function useGitHubRepository(owner: string, repo: string, branch: string = 'main') {
-  const queryClient = useQueryClient();
-  const [state, setState] = useState<GitHubRepositoryState>({
-    isLoading: false,
-    isLoaded: false,
-    error: null,
-  });
-
   // Fetch repository info and validate it exists
   const { data: repoInfo, isLoading: repoLoading, error: repoError } = useQuery({
     queryKey: ['github-repo', owner, repo],
@@ -156,7 +143,6 @@ export function useGitHubRepository(owner: string, repo: string, branch: string 
   };
 
   return {
-    state,
     repoInfo,
     isLoaded: !!repoInfo && !repoError,
     isLoading: repoLoading,
