@@ -68,7 +68,7 @@ export function Layout({ children }: LayoutProps) {
       {/* <ThemeTest /> */}
 
       {/* <header className="glass border-b border-white/10 sticky top-0 z-50"> */}
-      <header className="border-b border-white/10 sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-background sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
             <div className="relative">
