@@ -34,7 +34,7 @@ export function AppRouter() {
     <BrowserRouter basename={basename}>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<AppsPage />} />
+        <Route path="/" element={<ListingsPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
         <Route path="/nips" element={<Index />} />
         <Route path="/nip/:id" element={<NipRedirect />} />

@@ -52,7 +52,7 @@ A comprehensive Nostr ecosystem explorer and directory for discovering NIPs, app
 ## URL Structure
 
 ### Main Sections
-- `/` - Application directory (home page)
+- `/` - Business listings directory (home page)
 - `/resources` - Nostr resources and tools hub
 - `/nips` - NIPs browser and directory
 - `/repositories` - Git repository explorer
