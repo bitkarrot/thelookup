@@ -75,7 +75,7 @@ export function Layout({ children }: LayoutProps) {
               <img 
                 src={theme === 'dark' ? "/light_nostrich.png" : "/nostrich.png"} 
                 alt="Nostrich" 
-                className={`h-6 w-6 sm:h-8 sm:w-8 transition-all duration-300 relative z-10 ${theme === 'light' ? 'brightness-75 contrast-125' : ''}`} 
+                className="h-6 w-6 sm:h-8 sm:w-8 transition-all duration-300 relative z-10" 
               />
               <div className="absolute inset-0 bg-accent/20 rounded-full blur-xl group-hover:bg-primary/20 transition-colors duration-300"></div>
             </div>
