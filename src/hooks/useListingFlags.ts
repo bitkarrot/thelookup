@@ -91,13 +91,15 @@ export function useListingFlags(stallEventId: string, stallAuthorPubkey: string,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['listing-flags', stallEventId] });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Failed to flag listing:', error);
-      console.error('Error details:', {
-        message: error?.message,
-        name: error?.name,
-        stack: error?.stack,
-      });
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+        });
+      }
     },
   });
 

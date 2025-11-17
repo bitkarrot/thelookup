@@ -1,6 +1,4 @@
 import { Zap } from 'lucide-react';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useAuthor } from '@/hooks/useAuthor';
 import { cn } from '@/lib/utils';
 import { ZapDialog } from '@/components/ZapDialog';
 import type { Event } from 'nostr-tools';
@@ -24,9 +22,6 @@ export function ZapButton({
   size = 'sm',
   showLabel = true,
 }: ZapButtonProps) {
-  const { user } = useCurrentUser();
-  const { data: author } = useAuthor(recipientPubkey);
-
   // Create a minimal Event object for ZapDialog
   // For addressable events (when eventCoordinate exists), use kind 30000 and proper tags
   const targetEvent: Event = {
@@ -52,7 +47,10 @@ export function ZapButton({
       >
         <button
           className={cn(
-            'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground text-orange-500 hover:text-orange-600',
+            'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input',
+            variant === 'outline' && 'bg-background hover:bg-accent hover:text-accent-foreground text-orange-500 hover:text-orange-600',
+            variant === 'default' && 'bg-primary text-primary-foreground hover:bg-primary/90',
+            variant === 'ghost' && 'bg-transparent hover:bg-accent text-orange-500',
             size === 'sm' && 'h-8 px-3',
             size === 'default' && 'h-9 px-4 py-2',
             size === 'lg' && 'h-10 px-8',

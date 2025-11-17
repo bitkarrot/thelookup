@@ -60,7 +60,7 @@ export function ListingFlagDialog({ listing, children }: ListingFlagDialogProps)
       setOpen(false);
       setReportType('');
       setContent('');
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to submit flag. Please try again.',
