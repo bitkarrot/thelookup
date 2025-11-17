@@ -13,6 +13,13 @@ A comprehensive Nostr ecosystem explorer and directory for discovering NIPs, app
 - **Community Submissions**: Submit and edit your own applications
 - **Community Moderation**: Report and flag inappropriate content using NIP-1984
 
+### 🏬 Business Listings Directory
+- **NIP-15 Business Stalls**: Discover marketplace stalls and businesses published on Nostr
+- **Search & Filter**: Search listings by name and description, and filter by tags
+- **Rich Listing Details**: Dedicated detail pages with images, description, Nostr event data, and shipping zones
+- **Owner Controls**: Listing owners can edit their stalls and request deletion via NIP-09
+- **Listing Flagging**: Community members can flag listings with NIP-1984 reports (fraud, spam, scam, duplicate, inappropriate, impersonation)
+
 ### 📖 NIPs (Nostr Implementation Possibilities)
 - **Official NIPs**: Browse and search through official NIPs from the [nostr-protocol/nips](https://github.com/nostr-protocol/nips) repository
 - **Custom NIPs**: Publish your own custom NIPs on the Nostr network using kind 30817 events
@@ -45,11 +52,17 @@ A comprehensive Nostr ecosystem explorer and directory for discovering NIPs, app
 ## URL Structure
 
 ### Main Sections
-- `/` - Application directory (home page)
+- `/` - Business listings directory (home page)
 - `/resources` - Nostr resources and tools hub
 - `/nips` - NIPs browser and directory
 - `/repositories` - Git repository explorer
 - `/dvm` - Data Vending Machine marketplace
+
+### Business Listings
+- `/listings` - Business directory for NIP-15 marketplace stalls
+- `/listings/submit` - Submit a new business listing
+- `/listings/:stallId` - View business listing details
+- `/listings/:stallId/edit` - Edit an existing business listing (owner only)
 
 ### NIPs
 - `/nip/01` - View official NIP-01
@@ -186,13 +199,18 @@ The theme system uses OKLCH color spaces for vibrant, consistent colors across l
 
 ### Lightning Payments
 
-TheLookup supports **Lightning payments for app submissions** to prevent spam and maintain directory quality:
+TheLookup supports **Lightning payments for submissions** (apps and business listings) to prevent spam and maintain directory quality:
 
 - **NIP-57 Integration**: Uses Lightning Zaps for payment verification
 - **Configurable Fees**: Set custom satoshi amounts for new submissions
-- **Smart Logic**: Only new users pay - existing app authors can edit for free
+- **Smart Logic**: Only new users pay - existing authors/listing owners can edit for free
 - **Multiple Wallets**: Supports QR codes, WebLN, and manual invoice copying
-- **Anti-Spam**: Helps maintain high-quality app directory
+- **Anti-Spam**: Helps maintain high-quality directories
+
+Key environment variables:
+
+- **Apps**: `VITE_SUBMIT_APP_PAYMENT_ENABLED`, `VITE_SUBMIT_APP_LIGHTNING_ADDRESS`, `VITE_SUBMIT_APP_FEE`
+- **Business listings**: `VITE_SUBMIT_LISTING_PAYMENT_ENABLED`, `VITE_SUBMIT_LISTING_LIGHTNING_ADDRESS`, `VITE_SUBMIT_LISTING_FEE`
 
 For detailed setup instructions, configuration options, and troubleshooting, see **[LIGHTNING_PAYMENTS.md](./LIGHTNING_PAYMENTS.md)**.
 
@@ -228,9 +246,9 @@ The `/apps` page displays **featured Nostr applications** in an auto-rotating ca
 
 To manage featured apps, edit **[public/FEATURED_APPS.md](./public/FEATURED_APPS.md)** following the documented format.
 
-## App Flagging System
+## Content Flagging System
 
-The app directory includes a community-driven content moderation system using NIP-1984 report events:
+The app and business listing directories include a community-driven content moderation system using NIP-1984 report events:
 
 ### Report Categories
 - **fraud** - Fake information

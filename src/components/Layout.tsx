@@ -4,7 +4,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { LoginArea } from "@/components/auth/LoginArea";
 import { Footer } from "@/components/Footer";
-import { Plus, Zap, Menu, Smartphone, GitBranch, Moon, Sun, Globe, Bot } from "lucide-react";
+import { Plus, Zap, Menu, Smartphone, GitBranch, Moon, Sun, Globe, Bot, Store } from "lucide-react";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import {
   Sheet,
@@ -35,6 +35,7 @@ const ALL_SECTIONS: NavSection[] = [
   { id: 'resources', path: '/resources', label: 'Resources', icon: Globe },
   { id: 'nips', path: '/nips', label: 'NIPs', icon: Zap },
   { id: 'apps', path: '/apps', label: 'Apps', icon: Smartphone },
+  { id: 'listings', path: '/listings', label: 'Listings', icon: Store },
   { id: 'repositories', path: '/repositories', label: 'Repositories', icon: GitBranch },
   { id: 'dvm', path: '/dvm', label: 'DVM', icon: Bot },
 ];
@@ -62,19 +63,19 @@ export function Layout({ children }: LayoutProps) {
   const visibleSections = getVisibleSections();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex flex-col">
+    <div className="min-h-screen bg-bkg-pattern flex flex-col">
       {/* Temporary theme test - remove this after confirming theme works */}
       {/* <ThemeTest /> */}
 
       {/* <header className="glass border-b border-white/10 sticky top-0 z-50"> */}
-      <header className="border-b border-white/10 sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-background sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
             <div className="relative">
               <img 
                 src={theme === 'dark' ? "/light_nostrich.png" : "/nostrich.png"} 
                 alt="Nostrich" 
-                className={`h-6 w-6 sm:h-8 sm:w-8 transition-all duration-300 relative z-10 ${theme === 'light' ? 'brightness-75 contrast-125' : ''}`} 
+                className="h-8 w-8 sm:h-9 sm:w-9 transition-all duration-300 relative z-10" 
               />
               <div className="absolute inset-0 bg-accent/20 rounded-full blur-xl group-hover:bg-primary/20 transition-colors duration-300"></div>
             </div>
