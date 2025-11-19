@@ -13,6 +13,7 @@ import { Search, Store, Plus, Grid3x3, List, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
+import { useAppConfig } from '@/components/AppProvider';
 
 function renderDescription(text: string) {
   const parts = text.split(/(https?:\/\/[^\s]+)/g);
@@ -42,6 +43,14 @@ export default function ListingsPage() {
     title: getPageTitle('Business Directory'),
     description: getPageDescription('Discover NIP-15 marketplace stalls (businesses) published on the Nostr network.'),
   });
+
+  const { config, availableRelays } = useAppConfig();
+  const selectedRelay = availableRelays.find((option) => option.url === config.relayUrl);
+  const relayLabel = selectedRelay
+    ? selectedRelay.name
+    : config.relayUrl
+      ? config.relayUrl.replace(/^wss?:\/\//, '')
+      : null;
 
   const { data: listings, isLoading, error } = useListings();
   const { user: _user } = useCurrentUser();
@@ -79,10 +88,17 @@ export default function ListingsPage() {
                 <Store className="h-8 w-8 text-primary" />
                 <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Business Directory</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Hivetalk's Business Directory</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Discover businesses and marketplace stalls published on the Nostr network.
+              {relayLabel && config.relayUrl && (
+                <span className="block mt-1">
+                  Currently viewing listings from{' '}
+                  <span className="font-medium">{relayLabel}</span>{' '}
+                  <span className="text-primary">({config.relayUrl})</span>.
+                </span>
+              )}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

@@ -16,6 +16,7 @@ import { Search, Smartphone, Globe, Zap, Plus, Grid3x3, List } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
+import { useAppConfig } from '@/components/AppProvider';
 
 const POPULAR_KINDS = [
   { kind: 1, name: 'Text Notes', icon: '📝' },
@@ -32,6 +33,14 @@ export default function AppsPage() {
     title: getPageTitle('Nostr Apps'),
     description: getPageDescription('Discover applications that can handle different types of Nostr events. Find the perfect app for your needs.'),
   });
+
+  const { config, availableRelays } = useAppConfig();
+  const selectedRelay = availableRelays.find((option) => option.url === config.relayUrl);
+  const relayLabel = selectedRelay
+    ? selectedRelay.name
+    : config.relayUrl
+      ? config.relayUrl.replace(/^wss?:\/\//, '')
+      : null;
 
   const { data: apps, isLoading, error } = useApps();
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,7 +88,14 @@ export default function AppsPage() {
               <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Nostr Apps</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover applications that can handle different types of Nostr events. 
+              Discover applications that can handle different types of Nostr events.
+              {relayLabel && config.relayUrl && (
+                <span className="block mt-1">
+                  Currently viewing apps from{' '}
+                  <span className="font-medium">{relayLabel}</span>{' '}
+                  <span className="text-primary">({config.relayUrl})</span>.
+                </span>
+              )}
             </p>
             
             {/* Stats and Submit Button */}
