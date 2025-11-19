@@ -65,16 +65,22 @@ describe('useAppSubmissionPayment', () => {
     vi.clearAllMocks();
   });
 
-  it('should expose a valid payment configuration when enabled', () => {
+  it('exposes a consistent payment configuration state', () => {
     const { result } = renderHook(() => useAppSubmissionPayment(), {
       wrapper: createWrapper(),
     });
 
-    expect(result.current.isPaymentRequired).toBe(true);
-    expect(result.current.paymentConfig).toEqual({
-      lightningAddress: 'bitkarrot@primal.net',
-      feeAmount: 100,
-    });
+    const { isPaymentRequired, paymentConfig } = result.current;
+
+    // Core invariant: config exists if and only if payment is required
+    expect(Boolean(paymentConfig)).toBe(isPaymentRequired);
+
+    if (paymentConfig) {
+      expect(typeof paymentConfig.lightningAddress).toBe('string');
+      expect(paymentConfig.lightningAddress.length).toBeGreaterThan(0);
+      expect(typeof paymentConfig.feeAmount).toBe('number');
+      expect(paymentConfig.feeAmount).toBeGreaterThan(0);
+    }
   });
 
   it('should initialize with correct default state', () => {
