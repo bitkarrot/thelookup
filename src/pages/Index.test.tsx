@@ -394,6 +394,6 @@ describe('Index', () => {
     // Verify the badge has the clickable styling
     const kindBadge = kindBadges[0];
     expect(kindBadge).toHaveClass('cursor-pointer');
-    expect(kindBadge).toHaveClass('hover:bg-primary/20');
+    expect(kindBadge).toHaveClass('hover:bg-purple-200');
   });
 });

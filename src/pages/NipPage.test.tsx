@@ -3,6 +3,11 @@ import { render, screen } from '@testing-library/react';
 import { TestApp } from '@/test/TestApp';
 import NipPage from './NipPage';
 
+// Mock ZapCustomNip to avoid pulling in NWC context / wallet logic in these tests
+vi.mock('@/components/ZapCustomNip', () => ({
+  ZapCustomNip: () => <div data-testid="zap-custom-nip" />,
+}));
+
 // Mock the hooks
 vi.mock('@/hooks/useCurrentUser', () => ({
   useCurrentUser: () => ({

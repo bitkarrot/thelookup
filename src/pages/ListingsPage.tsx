@@ -44,7 +44,7 @@ export default function ListingsPage() {
   });
 
   const { data: listings, isLoading, error } = useListings();
-  const { user } = useCurrentUser();
+  const { user: _user } = useCurrentUser();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);

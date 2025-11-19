@@ -49,7 +49,7 @@ describe('EditNipPage', () => {
     });
 
     mockUseNostrPublish.mockReturnValue({
-      mutate: mockPublishEvent,
+      mutateAsync: mockPublishEvent,
       isPending: false,
     });
   });
@@ -96,8 +96,8 @@ describe('EditNipPage', () => {
     fireEvent.click(submitButton);
 
     // Verify that the publish function was called with fork markers preserved
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
+    await waitFor(() => {
+      expect(mockPublishEvent).toHaveBeenCalledWith({
         kind: 30817,
         content: 'This is a forked NIP content.',
         tags: [
@@ -106,9 +106,8 @@ describe('EditNipPage', () => {
           ['k', '1'],
           ['a', '30817:original-author:original-nip', '', 'fork'], // Fork marker preserved
         ],
-      },
-      expect.any(Object)
-    );
+      });
+    });
   });
 
   it('preserves fork markers when editing a forked official NIP', async () => {
@@ -153,8 +152,8 @@ describe('EditNipPage', () => {
     fireEvent.click(submitButton);
 
     // Verify that the publish function was called with fork markers preserved
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
+    await waitFor(() => {
+      expect(mockPublishEvent).toHaveBeenCalledWith({
         kind: 30817,
         content: 'Updated forked official NIP content.',
         tags: [
@@ -163,9 +162,8 @@ describe('EditNipPage', () => {
           ['k', '42'],
           ['i', 'https://github.com/nostr-protocol/nips/blob/master/01.md', 'fork'], // Fork marker preserved
         ],
-      },
-      expect.any(Object)
-    );
+      });
+    });
   });
 
   it('preserves multiple fork markers when present', async () => {
@@ -208,8 +206,8 @@ describe('EditNipPage', () => {
     fireEvent.click(submitButton);
 
     // Verify that both fork markers are preserved
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
+    await waitFor(() => {
+      expect(mockPublishEvent).toHaveBeenCalledWith({
         kind: 30817,
         content: 'This NIP is forked from multiple sources.',
         tags: [
@@ -220,9 +218,8 @@ describe('EditNipPage', () => {
           ['a', '30817:original-author:original-nip', '', 'fork'], // Both fork markers preserved
           ['i', 'https://github.com/nostr-protocol/nips/blob/master/01.md', 'fork'],
         ],
-      },
-      expect.any(Object)
-    );
+      });
+    });
   });
 
   it('does not add fork markers when editing a non-forked NIP', async () => {
@@ -262,8 +259,8 @@ describe('EditNipPage', () => {
     fireEvent.click(submitButton);
 
     // Verify that no fork markers are added
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
+    await waitFor(() => {
+      expect(mockPublishEvent).toHaveBeenCalledWith({
         kind: 30817,
         content: 'This is a regular NIP content.',
         tags: [
@@ -272,9 +269,8 @@ describe('EditNipPage', () => {
           ['k', '1'],
           // No fork markers should be present
         ],
-      },
-      expect.any(Object)
-    );
+      });
+    });
   });
 
   it('ignores malformed fork tags', async () => {
@@ -317,8 +313,8 @@ describe('EditNipPage', () => {
     fireEvent.click(submitButton);
 
     // Verify that only valid fork markers are preserved
-    expect(mockPublishEvent).toHaveBeenCalledWith(
-      {
+    await waitFor(() => {
+      expect(mockPublishEvent).toHaveBeenCalledWith({
         kind: 30817,
         content: 'This NIP has some malformed fork tags.',
         tags: [
@@ -327,8 +323,7 @@ describe('EditNipPage', () => {
           ['k', '1'],
           ['a', '30817:valid-author:valid-nip', '', 'fork'], // Only valid fork marker preserved
         ],
-      },
-      expect.any(Object)
-    );
+      });
+    });
   });
 });

@@ -396,7 +396,6 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
               {watchedImage?.trim() && (
                 <div className="mt-3 border rounded-md bg-muted/40 overflow-hidden">
                   <div className="w-full" style={{ aspectRatio: '3 / 1' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={watchedImage}
                       alt="Listing header preview"
