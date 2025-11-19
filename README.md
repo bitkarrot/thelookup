@@ -327,3 +327,5 @@ MIT License - see LICENSE file for details.
 **Built with ❤️ for the Nostr community**
 
 *TheLookup is an open-source project dedicated to making the Nostr ecosystem more discoverable and accessible to everyone.*
+
+ The Lookup is based on a fork of nostrhub.io 
