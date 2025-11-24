@@ -20,8 +20,7 @@ const TEST_PRIVATE_KEY = crypto.randomBytes(32).toString('hex');
 const TEST_PUBLIC_KEY = getPublicKey(TEST_PRIVATE_KEY);
 
 // Relays to check for zap receipts (prioritize the ones we know work)
-const RELAYS_TO_CHECK = [
-  'wss://hivetalk.nostr1.com', // New default relay for testing
+const RELAYS_TO_CHECK = [  // New default relay for testing
   'wss://relay.nostr.net',     // Found 1 receipt in test
   'wss://relay.primal.net',    // Found 4 receipts in test  
   'wss://relay.nostr.band',    // Found 5 receipts in test
@@ -170,7 +169,7 @@ async function createZapRequest(recipientPubkey, amountMsats) {
     kind: 9734,
     content: `Test zap request from NIP-57 flow test script`,
     tags: [
-      ['relays', 'wss://hivetalk.nostr1.com', 'wss://relay.primal.net'], // NIP-57: multiple relays
+      ['relays', 'wss://relay.nostr.net', 'wss://relay.primal.net'], // NIP-57: multiple relays
       ['amount', amountMsats.toString()],
       ['lnurl', lnurl], // NIP-57: required lnurl tag
       ['p', recipientPubkey],
@@ -248,7 +247,7 @@ async function waitForPayment(lightningPubkey, zapRequestId, userPubkey) {
     
     // Check the top 3 relays that we know have zap receipts
     const relaysToCheck = [
-      'wss://hivetalk.nostr1.com',
+      'wss://relay.nostr.net',
       'wss://relay.primal.net', 
       'wss://relay.nostr.band'
     ];

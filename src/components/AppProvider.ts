@@ -17,7 +17,6 @@ interface RelayInfo {
 // Available relay options
 export const RELAY_OPTIONS: RelayInfo[] = [
   { url: 'wss://relay.nostr.net', name: 'Nostr.NET' },
-  { url: 'wss://hivetalk.nostr1.com', name: 'HiveTalk' },
 ];
 
 // Default application configuration

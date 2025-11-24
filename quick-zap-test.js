@@ -8,7 +8,6 @@ import { WebSocket } from 'ws';
 
 const LIGHTNING_ADDRESS = 'bitkarrot@primal.net';
 const RELAYS_TO_CHECK = [
-  'wss://hivetalk.nostr1.com', // New default relay for testing
   'wss://relay.nostr.net',
   'wss://relay.primal.net',
   'wss://nos.lol',

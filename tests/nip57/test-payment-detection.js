@@ -14,7 +14,6 @@ const LIGHTNING_PUBKEY = 'f81611363554b64306467234d7396ec88455707633f54738f6c468
 
 // Relays that we know have zap receipts
 const RELAYS_TO_MONITOR = [
-  'wss://hivetalk.nostr1.com',
   'wss://relay.nostr.net',
   'wss://relay.primal.net', 
   'wss://relay.nostr.band'

@@ -88,7 +88,7 @@ export default function ListingsPage() {
                 <Store className="h-8 w-8 text-primary" />
                 <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Hivetalk's Business Directory</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold title-shadow">Nostr Business Directory</h1>
             </div>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Discover businesses and marketplace stalls published on the Nostr network.
