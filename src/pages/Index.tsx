@@ -18,8 +18,8 @@ import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 
 const Index = () => {
   useSeoMeta({
-    title: getPageTitle('Discover and Publish NIPs'),
-    description: getPageDescription('Explore official NIPs and publish your own custom NIPs'),
+    title: getPageTitle('Discover Nostr Businesses and Apps'),
+    description: getPageDescription('Explore Nostr Businesses, Apps and more'),
   });
 
   const navigate = useNavigate();

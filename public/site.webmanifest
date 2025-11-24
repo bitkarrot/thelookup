@@ -1,7 +1,7 @@
 {
   "name": "NostrHub",
   "short_name": "NostrHub",
-  "description": "Discover and publish Nostr Implementation Possibilities",
+  "description": "Discover and publish Nostr Businesses, apps and Implementation Possibilities",
   "start_url": "/",
   "scope": "/",
   "id": "https://nostrhub.io/",
