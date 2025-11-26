@@ -4,15 +4,16 @@
  */
 
 export function getSiteName(): string {
-  return import.meta.env.VITE_SITE_NAME || 'nostrhub.io';
+  return import.meta.env.VITE_SITE_NAME || 'The Lookup';
 }
 
 export function getSiteUrl(): string {
-  return import.meta.env.VITE_SITE_URL || 'https://nostrhub.io';
+  return import.meta.env.VITE_SITE_URL || 'https://lookup.hivetalk.org';
 }
 
-export function getClientTag(): string {
-  return getSiteName();
+export function getClientTag(): string | null {
+  // Only return a client tag if VITE_SITE_NAME is explicitly set
+  return import.meta.env.VITE_SITE_NAME || null;
 }
 
 export function getSiteDisplayName(): string {

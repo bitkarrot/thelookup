@@ -115,8 +115,13 @@ export function useCreateIssue() {
         ['a', `30617:${repositoryPubkey}:${repositoryId}`],
         ['p', repositoryPubkey],
         ['subject', subject],
-        ['client', getClientTag()], // Add client tag
       ];
+
+      // Add client tag if configured
+      const clientTag = getClientTag();
+      if (clientTag) {
+        tags.push(['client', clientTag]);
+      }
 
       // Add label tags
       labels.forEach(label => {

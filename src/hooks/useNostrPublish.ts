@@ -20,9 +20,10 @@ export function useNostrPublish() {
       if (user) {
         const tags = t.tags ?? [];
 
-        // Add the client tag if it doesn't exist
-        if (!tags.some((tag) => tag[0] === "client")) {
-          tags.push(["client", getClientTag()]);
+        // Add the client tag if it doesn't exist and a client tag is configured
+        const clientTag = getClientTag();
+        if (clientTag && !tags.some((tag) => tag[0] === "client")) {
+          tags.push(["client", clientTag]);
         }
 
         const event = await user.signer.signEvent({

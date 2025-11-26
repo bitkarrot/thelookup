@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
 import type { NostrEvent } from '@nostrify/nostrify';
+import { getClientTag } from '@/lib/siteConfig';
 
 // NIP-15 stall (business) model - kind 30017
 export interface StallShippingZone {
@@ -138,7 +139,13 @@ export function useListings() {
       const validEvents = events.filter(validateStallEvent);
       const stalls = validEvents.map(parseStallEvent);
 
-      return stalls.sort((a, b) => b.createdAt - a.createdAt);
+      // Filter to only show entries tagged with the client tag (if client tag is configured)
+      const clientTag = getClientTag();
+      const clientTaggedStalls = clientTag 
+        ? stalls.filter(stall => stall.tags.includes(clientTag))
+        : stalls; // Show all stalls if no client tag is configured
+
+      return clientTaggedStalls.sort((a, b) => b.createdAt - a.createdAt);
     },
     staleTime: 5 * 60 * 1000,
   });
