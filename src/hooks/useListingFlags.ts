@@ -3,6 +3,7 @@ import type { NostrEvent } from '@nostrify/nostrify';
 import { useNostr } from '@nostrify/react';
 import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
+import { debugLog, debugWarn, debugError } from '@/lib/debug';
 
 export interface ListingFlag {
   id: string;
@@ -55,9 +56,9 @@ export function useListingFlags(stallEventId: string, stallAuthorPubkey: string,
         }
       ], { signal });
       
-      console.log(`🚩 [DEBUG] Found ${events.length} kind 1984 events for stall ${stallEventId}`);
+      debugLog(`🚩 [DEBUG] Found ${events.length} kind 1984 events for stall ${stallEventId}`);
       events.forEach((event, index) => {
-        console.log(`🚩 [DEBUG] Kind 1984 Event ${index + 1}:`, JSON.stringify(event, null, 2));
+        debugLog(`🚩 [DEBUG] Kind 1984 Event ${index + 1}:`, JSON.stringify(event, null, 2));
       });
       
       // Parse and validate the flag events
@@ -92,7 +93,7 @@ export function useListingFlags(stallEventId: string, stallAuthorPubkey: string,
             event,
           });
         } catch (error) {
-          console.warn('Failed to parse flag event:', event.id, error);
+          debugWarn('Failed to parse flag event:', event.id, error);
         }
       }
       
@@ -146,9 +147,9 @@ export function useListingFlags(stallEventId: string, stallAuthorPubkey: string,
       queryClient.invalidateQueries({ queryKey: ['listing-flags', stallEventId] });
     },
     onError: (error: unknown) => {
-      console.error('Failed to flag listing:', error);
+      debugError('Failed to flag listing:', error);
       if (error instanceof Error) {
-        console.error('Error details:', {
+        debugError('Error details:', {
           message: error.message,
           name: error.name,
           stack: error.stack,

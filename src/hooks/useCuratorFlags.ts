@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { isClientSideCurationEnabled, getCuratorPubkeys } from '@/lib/siteConfig';
+import { debugLog, debugWarn, debugError } from '@/lib/debug';
 
 export interface CuratorFlag {
   stallEventId: string;
@@ -32,7 +33,7 @@ export function useCuratorFlags() {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(10000)]);
 
       try {
-        console.log('🏛️ [DEBUG] useCuratorFlags - Querying with curator pubkeys:', curatorPubkeys);
+        debugLog('🏛️ [DEBUG] useCuratorFlags - Querying with curator pubkeys:', curatorPubkeys);
         
         // Query for kind 1984 events from curator pubkeys
         const events = await nostr.query([
@@ -43,9 +44,9 @@ export function useCuratorFlags() {
           }
         ], { signal });
 
-        console.log(`🏛️ [DEBUG] useCuratorFlags - Found ${events.length} curator flag events`);
+        debugLog(`🏛️ [DEBUG] useCuratorFlags - Found ${events.length} curator flag events`);
         events.forEach((event, index) => {
-          console.log(`🏛️ [DEBUG] Curator Flag Event ${index + 1}:`, JSON.stringify(event, null, 2));
+          debugLog(`🏛️ [DEBUG] Curator Flag Event ${index + 1}:`, JSON.stringify(event, null, 2));
         });
 
         const curatorFlags: CuratorFlag[] = [];
@@ -84,13 +85,13 @@ export function useCuratorFlags() {
               event,
             });
           } catch (error) {
-            console.warn('Failed to parse curator flag event:', event.id, error);
+            debugWarn('Failed to parse curator flag event:', event.id, error);
           }
         }
 
         return curatorFlags.sort((a, b) => b.createdAt - a.createdAt);
       } catch (error) {
-        console.error('Failed to fetch curator flags:', error);
+        debugError('Failed to fetch curator flags:', error);
         return [];
       }
     },

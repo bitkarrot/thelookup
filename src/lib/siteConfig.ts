@@ -4,6 +4,7 @@
  */
 
 import { nip19 } from 'nostr-tools';
+import { debugLog, debugWarn } from './debug';
 
 export function getSiteName(): string {
   return import.meta.env.VITE_SITE_NAME || 'The Lookup';
@@ -73,7 +74,7 @@ export function getCuratorPubkeys(): string[] {
   const npubs = getCuratorNpubs();
   const pubkeys: string[] = [];
   
-  console.log('🔍 [DEBUG] getCuratorPubkeys - Input npubs:', npubs);
+  debugLog('🔍 [DEBUG] getCuratorPubkeys - Input npubs:', npubs);
   
   for (const npub of npubs) {
     try {
@@ -83,16 +84,16 @@ export function getCuratorPubkeys(): string[] {
       const pubkey = convertNpubToPubkey(npub);
       if (pubkey) {
         pubkeys.push(pubkey);
-        console.log(`🔍 [DEBUG] Converted ${npub} -> ${pubkey}`);
+        debugLog(`🔍 [DEBUG] Converted ${npub} -> ${pubkey}`);
       } else {
-        console.warn(`🔍 [DEBUG] Failed to convert npub: ${npub}`);
+        debugWarn(`🔍 [DEBUG] Failed to convert npub: ${npub}`);
       }
     } catch (error) {
-      console.warn(`Invalid npub in NPUB_CURATORS: ${npub}`, error);
+      debugWarn(`Invalid npub in NPUB_CURATORS: ${npub}`, error);
     }
   }
   
-  console.log('🔍 [DEBUG] getCuratorPubkeys - Final pubkeys:', pubkeys);
+  debugLog('🔍 [DEBUG] getCuratorPubkeys - Final pubkeys:', pubkeys);
   return pubkeys;
 }
 
@@ -105,10 +106,10 @@ function convertNpubToPubkey(npub: string): string | null {
       return decoded.data as string;
     }
     
-    console.warn(`Invalid npub type: ${decoded.type}, expected 'npub'`);
+    debugWarn(`Invalid npub type: ${decoded.type}, expected 'npub'`);
     return null;
   } catch (error) {
-    console.warn(`Failed to decode npub ${npub}:`, error);
+    debugWarn(`Failed to decode npub ${npub}:`, error);
     return null;
   }
 }

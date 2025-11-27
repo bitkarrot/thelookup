@@ -3,6 +3,7 @@ import { useNostr } from '@nostrify/react';
 import type { NostrEvent } from '@nostrify/nostrify';
 import { getClientTag, isClientSideCurationEnabled } from '@/lib/siteConfig';
 import { useCuratorFlags } from './useCuratorFlags';
+import { debugLog } from '@/lib/debug';
 
 // NIP-15 stall (business) model - kind 30017
 export interface StallShippingZone {
@@ -154,12 +155,12 @@ export function useListings() {
 
       // Apply client-side curation if enabled
       let curatedStalls = clientTaggedStalls;
-      console.log('📋 [DEBUG] useListings - Curation enabled:', curationEnabled);
-      console.log('📋 [DEBUG] useListings - Curator flags count:', curatorFlags.length);
-      console.log('📋 [DEBUG] useListings - Stalls before curation:', clientTaggedStalls.length);
+      debugLog('📋 [DEBUG] useListings - Curation enabled:', curationEnabled);
+      debugLog('📋 [DEBUG] useListings - Curator flags count:', curatorFlags.length);
+      debugLog('📋 [DEBUG] useListings - Stalls before curation:', clientTaggedStalls.length);
       
       if (curationEnabled && curatorFlags.length > 0) {
-        console.log('📋 [DEBUG] useListings - Applying curation filter...');
+        debugLog('📋 [DEBUG] useListings - Applying curation filter...');
         curatedStalls = clientTaggedStalls.filter(stall => {
           // Check if this stall is flagged by any curator
           const isFlagged = curatorFlags.some(
@@ -167,12 +168,12 @@ export function useListings() {
           );
           
           if (isFlagged) {
-            console.log(`📋 [DEBUG] useListings - Filtering out flagged stall: ${stall.id} (${stall.name})`);
+            debugLog(`📋 [DEBUG] useListings - Filtering out flagged stall: ${stall.id} (${stall.name})`);
           }
           
           return !isFlagged; // Only show stalls that are NOT flagged
         });
-        console.log('📋 [DEBUG] useListings - Stalls after curation:', curatedStalls.length);
+        debugLog('📋 [DEBUG] useListings - Stalls after curation:', curatedStalls.length);
       }
 
       return curatedStalls.sort((a, b) => b.createdAt - a.createdAt);
