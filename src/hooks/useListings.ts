@@ -142,7 +142,11 @@ export function useListings() {
       // Filter to only show entries tagged with the client tag (if client tag is configured)
       const clientTag = getClientTag();
       const clientTaggedStalls = clientTag 
-        ? stalls.filter(stall => stall.tags.includes(clientTag))
+        ? stalls.filter(stall => {
+            // Check if the original event has a 'client' tag with the matching value
+            const eventClientTag = stall.event.tags.find(([name]) => name === 'client')?.[1];
+            return eventClientTag === clientTag;
+          })
         : stalls; // Show all stalls if no client tag is configured
 
       return clientTaggedStalls.sort((a, b) => b.createdAt - a.createdAt);

@@ -55,7 +55,7 @@ describe('useListings client tag filtering', () => {
         content: '{"id": "stall1", "name": "Stall 1", "currency": "USD"}',
         tags: [
           ['d', 'stall1'],
-          ['t', 'The Lookup'],
+          ['client', 'The Lookup'],
           ['t', 'service']
         ],
         created_at: 1000,
@@ -81,7 +81,7 @@ describe('useListings client tag filtering', () => {
         content: '{"id": "stall3", "name": "Stall 3", "currency": "USD"}',
         tags: [
           ['d', 'stall3'],
-          ['t', 'The Lookup'],
+          ['client', 'The Lookup'],
           ['t', 'consulting']
         ],
         created_at: 3000,
@@ -95,7 +95,10 @@ describe('useListings client tag filtering', () => {
     // Apply the client tag filter (same logic as in useListings)
     const clientTag = getClientTag();
     const clientTaggedStalls = clientTag 
-      ? stalls.filter(stall => stall.tags.includes(clientTag))
+      ? stalls.filter(stall => {
+          const eventClientTag = stall.event.tags.find(([name]) => name === 'client')?.[1];
+          return eventClientTag === clientTag;
+        })
       : stalls;
 
     // Should only return stalls with 'client' tag
@@ -128,7 +131,10 @@ describe('useListings client tag filtering', () => {
     const stalls = mockEvents.map(parseStallEvent);
     const clientTag = getClientTag();
     const clientTaggedStalls = clientTag 
-      ? stalls.filter(stall => stall.tags.includes(clientTag))
+      ? stalls.filter(stall => {
+          const eventClientTag = stall.event.tags.find(([name]) => name === 'client')?.[1];
+          return eventClientTag === clientTag;
+        })
       : stalls;
 
     expect(clientTaggedStalls).toHaveLength(0);
@@ -143,7 +149,7 @@ describe('useListings client tag filtering', () => {
         content: '{"id": "stall1", "name": "Stall 1", "currency": "USD"}',
         tags: [
           ['d', 'stall1'],
-          ['t', 'The Lookup']
+          ['client', 'The Lookup']
         ],
         created_at: 1000,
         sig: 'sig1'
@@ -155,7 +161,7 @@ describe('useListings client tag filtering', () => {
         content: '{"id": "stall2", "name": "Stall 2", "currency": "USD"}',
         tags: [
           ['d', 'stall2'],
-          ['t', 'The Lookup'],
+          ['client', 'The Lookup'],
           ['t', 'service']
         ],
         created_at: 2000,
@@ -166,7 +172,10 @@ describe('useListings client tag filtering', () => {
     const stalls = mockEvents.map(parseStallEvent);
     const clientTag = getClientTag();
     const clientTaggedStalls = clientTag 
-      ? stalls.filter(stall => stall.tags.includes(clientTag))
+      ? stalls.filter(stall => {
+          const eventClientTag = stall.event.tags.find(([name]) => name === 'client')?.[1];
+          return eventClientTag === clientTag;
+        })
       : stalls;
 
     expect(clientTaggedStalls).toHaveLength(2);
@@ -211,7 +220,10 @@ describe('useListings client tag filtering', () => {
 
     const stalls = mockEvents.map(parseStallEvent);
     const clientTaggedStalls = clientTag 
-      ? stalls.filter(stall => stall.tags.includes(clientTag))
+      ? stalls.filter(stall => {
+          const eventClientTag = stall.event.tags.find(([name]) => name === 'client')?.[1];
+          return eventClientTag === clientTag;
+        })
       : stalls;
 
     // Should return ALL stalls when no client tag is configured
