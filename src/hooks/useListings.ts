@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
 import type { NostrEvent } from '@nostrify/nostrify';
-import { getClientTag } from '@/lib/siteConfig';
+import { getClientTag, isClientSideCurationEnabled } from '@/lib/siteConfig';
+import { useCuratorFlags } from './useCuratorFlags';
 
 // NIP-15 stall (business) model - kind 30017
 export interface StallShippingZone {
@@ -129,9 +130,11 @@ function parseStallEvent(event: NostrEvent): BusinessStallInfo {
 
 export function useListings() {
   const { nostr } = useNostr();
+  const curationEnabled = isClientSideCurationEnabled();
+  const { data: curatorFlags = [] } = useCuratorFlags();
 
   return useQuery({
-    queryKey: ['business-stalls'],
+    queryKey: ['business-stalls', curationEnabled, curatorFlags.length],
     queryFn: async (c) => {
       const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
 
@@ -149,7 +152,30 @@ export function useListings() {
           })
         : stalls; // Show all stalls if no client tag is configured
 
-      return clientTaggedStalls.sort((a, b) => b.createdAt - a.createdAt);
+      // Apply client-side curation if enabled
+      let curatedStalls = clientTaggedStalls;
+      console.log('📋 [DEBUG] useListings - Curation enabled:', curationEnabled);
+      console.log('📋 [DEBUG] useListings - Curator flags count:', curatorFlags.length);
+      console.log('📋 [DEBUG] useListings - Stalls before curation:', clientTaggedStalls.length);
+      
+      if (curationEnabled && curatorFlags.length > 0) {
+        console.log('📋 [DEBUG] useListings - Applying curation filter...');
+        curatedStalls = clientTaggedStalls.filter(stall => {
+          // Check if this stall is flagged by any curator
+          const isFlagged = curatorFlags.some(
+            flag => flag.stallEventId === stall.id && flag.stallAuthorPubkey === stall.pubkey
+          );
+          
+          if (isFlagged) {
+            console.log(`📋 [DEBUG] useListings - Filtering out flagged stall: ${stall.id} (${stall.name})`);
+          }
+          
+          return !isFlagged; // Only show stalls that are NOT flagged
+        });
+        console.log('📋 [DEBUG] useListings - Stalls after curation:', curatedStalls.length);
+      }
+
+      return curatedStalls.sort((a, b) => b.createdAt - a.createdAt);
     },
     staleTime: 5 * 60 * 1000,
   });

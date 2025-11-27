@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { NostrEvent } from '@nostrify/nostrify';
+import { useNostr } from '@nostrify/react';
 import { useCurrentUser } from './useCurrentUser';
 import { useNostrPublish } from './useNostrPublish';
 
@@ -30,6 +31,7 @@ const LISTING_REPORT_TYPES = {
 
 export function useListingFlags(stallEventId: string, stallAuthorPubkey: string, stallDTag: string) {
   const { user } = useCurrentUser();
+  const { nostr } = useNostr();
   const queryClient = useQueryClient();
   const publishEvent = useNostrPublish();
 
@@ -39,10 +41,62 @@ export function useListingFlags(stallEventId: string, stallAuthorPubkey: string,
     error,
   } = useQuery<ListingFlag[]>({
     queryKey: ['listing-flags', stallEventId],
-    queryFn: async () => {
+    queryFn: async (c) => {
       if (!stallEventId || !stallAuthorPubkey) return [];
-      // TODO: implement querying of NIP-1984 events for this stall
-      return [];
+      
+      const signal = AbortSignal.any([c.signal, AbortSignal.timeout(5000)]);
+      
+      // Query for kind 1984 events that reference this stall
+      const events = await nostr.query([
+        {
+          kinds: [1984],
+          '#e': [stallEventId], // Events that reference this stall event
+          limit: 100,
+        }
+      ], { signal });
+      
+      console.log(`🚩 [DEBUG] Found ${events.length} kind 1984 events for stall ${stallEventId}`);
+      events.forEach((event, index) => {
+        console.log(`🚩 [DEBUG] Kind 1984 Event ${index + 1}:`, JSON.stringify(event, null, 2));
+      });
+      
+      // Parse and validate the flag events
+      const parsedFlags: ListingFlag[] = [];
+      
+      for (const event of events) {
+        try {
+          // Find the report type from tags
+          const reportTag = event.tags.find(([name]) => name === 'report');
+          const reportType = reportTag?.[1];
+          
+          if (!reportType || !Object.keys(LISTING_REPORT_TYPES).includes(reportType)) {
+            continue; // Skip invalid report types
+          }
+          
+          // Verify this flag is for the correct stall
+          const eTag = event.tags.find(([name]) => name === 'e')?.[1];
+          const pTag = event.tags.find(([name]) => name === 'p')?.[1];
+          
+          if (eTag !== stallEventId || pTag !== stallAuthorPubkey) {
+            continue; // Skip flags not for this stall
+          }
+          
+          parsedFlags.push({
+            id: event.id,
+            stallEventId,
+            stallAuthorPubkey,
+            reporterPubkey: event.pubkey,
+            reportType: reportType as keyof typeof LISTING_REPORT_TYPES,
+            content: event.content || '',
+            createdAt: event.created_at,
+            event,
+          });
+        } catch (error) {
+          console.warn('Failed to parse flag event:', event.id, error);
+        }
+      }
+      
+      return parsedFlags.sort((a, b) => b.createdAt - a.createdAt);
     },
     enabled: !!(stallEventId && stallAuthorPubkey),
   });
