@@ -15,23 +15,32 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { useAppConfig } from '@/components/AppProvider';
 
-function renderDescription(text: string) {
+function renderDescription(text: string, makeLinksClickable: boolean = true) {
   const parts = text.split(/(https?:\/\/[^\s]+)/g);
 
   return parts.map((part, index) => {
     if (/^https?:\/\//.test(part)) {
-      return (
-        <a
-          key={index}
-          href={part}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline underline-offset-2 text-primary break-words"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {part}
-        </a>
-      );
+      if (makeLinksClickable) {
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 text-primary break-words"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {part}
+          </a>
+        );
+      } else {
+        // Just show the URL as text without making it clickable
+        return (
+          <span key={index} className="text-primary break-words">
+            {part}
+          </span>
+        );
+      }
     }
 
     return <span key={index}>{part}</span>;
@@ -233,7 +242,7 @@ export default function ListingsPage() {
                           <CardContent className="space-y-2">
                             {listing.description && (
                               <p className="text-sm text-muted-foreground line-clamp-3">
-                                {renderDescription(listing.description)}
+                                {renderDescription(listing.description, false)}
                               </p>
                             )}
                             {listing.tags.length > 0 && (
@@ -335,7 +344,7 @@ export default function ListingsPage() {
                             </div>
                           {listing.description && (
                             <p className="text-sm text-muted-foreground line-clamp-2">
-                              {renderDescription(listing.description)}
+                              {renderDescription(listing.description, false)}
                             </p>
                           )}
                           <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
