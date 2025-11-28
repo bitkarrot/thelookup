@@ -4,6 +4,7 @@ import { Layout } from '@/components/Layout';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
 import { useListings } from '@/hooks/useListings';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useToast } from '@/hooks/useToast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ export default function EditListingPage() {
   const { data: listings, isLoading, error } = useListings();
   const { user } = useCurrentUser();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { mutate: deleteListing, isPending: isDeleting } = useDeleteListing();
 
   const normalizedParam = stallId ? decodeURIComponent(stallId).toLowerCase() : '';
@@ -115,6 +117,10 @@ export default function EditListingPage() {
                           { stall: listing },
                           {
                             onSuccess: () => {
+                              toast({
+                                title: 'Listing Deleted Successfully!',
+                                description: 'Your listing has been removed from the directory and will no longer appear in search results.',
+                              });
                               navigate('/listings');
                             },
                           },

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +40,7 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
   const { mutate: publishEvent, isPending } = useNostrPublish();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { isPaymentRequired, paymentConfig } = useListingSubmissionPayment();
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
@@ -228,9 +230,15 @@ export function BusinessListingForm({ existingStall, mode: _mode = 'create' }: B
       {
         onSuccess: (event) => {
           setIsSubmitting(false);
+          
+          // Invalidate the listings cache to show the new/updated listing immediately
+          queryClient.invalidateQueries({ queryKey: ['business-stalls'] });
+          
           toast({
             title: 'Listing Submitted Successfully!',
-            description: 'Your listing has been published to the Nostr network.',
+            description: existingStall 
+              ? 'Your listing has been updated and will appear immediately in the directory.'
+              : 'Your listing has been published to the Nostr network and will appear immediately in the directory.',
           });
 
           const dTagFromEvent = event.tags.find(([name]) => name === 'd')?.[1];
