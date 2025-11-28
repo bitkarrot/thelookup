@@ -3,20 +3,23 @@ import { nip19 } from 'nostr-tools';
 import { useSeoMeta } from '@unhead/react';
 import { useAppConfig } from '@/components/AppProvider';
 import { Layout } from '@/components/Layout';
-import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
+import { getPageTitle, getPageDescription, isSectionVisible } from '@/lib/siteConfig';
 import { CustomNipCard } from '@/components/CustomNipCard';
 import { AppCard } from '@/components/AppCard';
 import { RepositoryCard } from '@/components/RepositoryCard';
 import { RepositoryCardSkeleton } from '@/components/RepositoryCardSkeleton';
+import { ListingCard } from '@/components/ListingCard';
 import { RelaySelector } from '@/components/RelaySelector';
 import { useAuthor } from '@/hooks/useAuthor';
 import { useCustomNipsByAuthor } from '@/hooks/useCustomNipsByAuthor';
 import { useAppsByAuthor } from '@/hooks/useAppsByAuthor';
 import { useRepositoriesByAuthor } from '@/hooks/useRepositories';
+import { useListingsByAuthor } from '@/hooks/useListingsByAuthor';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDeleteNip } from '@/hooks/useDeleteNip';
 import { useDeleteApp } from '@/hooks/useDeleteApp';
 import { useDeleteRepository } from '@/hooks/useDeleteRepository';
+import { useDeleteListing } from '@/hooks/useDeleteListing';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,13 +29,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowLeft, AlertCircle, ExternalLink, MapPin, Globe, Zap, MoreVertical, Edit, Trash2, Plus, FileText, Smartphone, GitBranch } from 'lucide-react';
+import { ArrowLeft, AlertCircle, ExternalLink, MapPin, Globe, Zap, MoreVertical, Edit, Trash2, Plus, FileText, Smartphone, GitBranch, Store } from 'lucide-react';
 import { EditProfileForm } from '@/components/EditProfileForm';
 import { genUserName } from '@/lib/genUserName';
 import { useToast } from '@/hooks/useToast';
 import { useState } from 'react';
 import type { NostrEvent } from '@/types/nostr';
 import type { AppInfo } from '@/hooks/useApps';
+import type { BusinessStallInfo } from '@/hooks/useListings';
 import NotFound from './NotFound';
 
 export default function AuthorPage() {
@@ -65,14 +69,17 @@ function AuthorView({ pubkey }: { pubkey: string }) {
   const { data: customNips, isLoading: nipsLoading, error: nipsError } = useCustomNipsByAuthor(pubkey);
   const { data: apps, isLoading: appsLoading, error: appsError } = useAppsByAuthor(pubkey);
   const { data: repositories, isLoading: repositoriesLoading, error: repositoriesError } = useRepositoriesByAuthor(pubkey);
+  const { data: listings, isLoading: listingsLoading, error: listingsError } = useListingsByAuthor(pubkey);
   const { user } = useCurrentUser();
   const { mutate: deleteNip } = useDeleteNip();
   const { mutate: deleteApp } = useDeleteApp();
   const { mutate: deleteRepository } = useDeleteRepository();
+  const { mutate: deleteListing } = useDeleteListing();
   const { toast } = useToast();
   const [deletingNipId, setDeletingNipId] = useState<string | null>(null);
   const [deletingAppId, setDeletingAppId] = useState<string | null>(null);
   const [deletingRepositoryId, setDeletingRepositoryId] = useState<string | null>(null);
+  const [deletingListingId, setDeletingListingId] = useState<string | null>(null);
   const { config } = useAppConfig();
 
   // Check if this is the current user's profile
@@ -154,6 +161,30 @@ function AuthorView({ pubkey }: { pubkey: string }) {
             variant: "destructive",
           });
           setDeletingRepositoryId(null);
+        },
+      }
+    );
+  };
+
+  const handleDeleteListing = (listing: BusinessStallInfo) => {
+    setDeletingListingId(listing.id);
+    deleteListing(
+      { stall: listing },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Listing deleted",
+            description: "Your listing has been deleted successfully.",
+          });
+          setDeletingListingId(null);
+        },
+        onError: (error) => {
+          toast({
+            title: "Failed to delete listing",
+            description: error instanceof Error ? error.message : "An error occurred",
+            variant: "destructive",
+          });
+          setDeletingListingId(null);
         },
       }
     );
@@ -317,6 +348,54 @@ function AuthorView({ pubkey }: { pubkey: string }) {
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
                   {deletingRepositoryId === event.id ? "Deleting..." : "Delete"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
+  const ListingActions = ({ listing }: { listing: BusinessStallInfo }) => {
+    if (!isOwnProfile) return null;
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem asChild>
+            <Link to={`/listings/${encodeURIComponent(listing.stallId)}/edit`}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Link>
+          </DropdownMenuItem>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Listing</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this listing? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleDeleteListing(listing)}
+                  disabled={deletingListingId === listing.id}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deletingListingId === listing.id ? "Deleting..." : "Delete"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -510,10 +589,17 @@ function AuthorView({ pubkey }: { pubkey: string }) {
           const hasCustomNips = customNips && customNips.length > 0;
           const hasApps = apps && apps.length > 0;
           const hasRepositories = repositories && repositories.length > 0;
-          const showCustomNipsSection = isOwnProfile || hasCustomNips || nipsLoading || nipsError;
-          const showAppsSection = isOwnProfile || hasApps || appsLoading || appsError;
-          const showRepositoriesSection = isOwnProfile || hasRepositories || repositoriesLoading || repositoriesError;
-          const showCombinedEmptyState = !nipsLoading && !appsLoading && !repositoriesLoading && !nipsError && !appsError && !repositoriesError && !hasCustomNips && !hasApps && !hasRepositories && !isOwnProfile;
+          const hasListings = listings && listings.length > 0;
+          
+          // Check which sections are visible based on configuration
+          const showCustomNipsSection = isSectionVisible('nips') && (isOwnProfile || hasCustomNips || nipsLoading || nipsError);
+          const showAppsSection = isSectionVisible('apps') && (isOwnProfile || hasApps || appsLoading || appsError);
+          const showRepositoriesSection = isSectionVisible('repositories') && (isOwnProfile || hasRepositories || repositoriesLoading || repositoriesError);
+          const showListingsSection = isSectionVisible('listings') && (isOwnProfile || hasListings || listingsLoading || listingsError);
+          
+          const showCombinedEmptyState = !nipsLoading && !appsLoading && !repositoriesLoading && !listingsLoading && 
+            !nipsError && !appsError && !repositoriesError && !listingsError && 
+            !hasCustomNips && !hasApps && !hasRepositories && !hasListings && !isOwnProfile;
 
           if (showCombinedEmptyState) {
             return (
@@ -528,7 +614,7 @@ function AuthorView({ pubkey }: { pubkey: string }) {
                     <div className="space-y-2">
                       <h3 className="font-semibold text-lg">No Content Found</h3>
                       <p className="text-muted-foreground">
-                        This author hasn't published any Custom NIPs, Apps, or Repositories on this relay. Try switching to another relay to discover more content.
+                        This author hasn't published any content on this relay. Try switching to another relay to discover more content.
                       </p>
                     </div>
                     <RelaySelector className="w-full" />
@@ -822,6 +908,108 @@ function AuthorView({ pubkey }: { pubkey: string }) {
                           {isOwnProfile && (
                             <div className="absolute top-2 right-2">
                               <RepositoryActions event={event} />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Listings Section */}
+              {showListingsSection && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl sm:text-2xl font-bold gradient-text pl-2 md:pl-0">
+                      Listings
+                    </h2>
+                    <div className="flex items-center gap-2 pr-2 md:pr-0">
+                      {hasListings && (
+                        <Badge variant="secondary" className="bg-accent/10 text-accent border-accent/20">
+                          {listings.length} Listing{listings.length !== 1 ? 's' : ''}
+                        </Badge>
+                      )}
+                      {isOwnProfile && (
+                        <Button size="sm" asChild>
+                          <Link to="/listings/submit">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Submit Listing
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {listingsLoading && (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <Skeleton key={i} className="h-64" />
+                      ))}
+                    </div>
+                  )}
+
+                  {listingsError && (
+                    <Card className="border-dashed border-destructive/50 rounded-none md:rounded-lg">
+                      <CardContent className="py-12 px-8 text-center">
+                        <div className="max-w-sm mx-auto space-y-6">
+                          <div className="flex justify-center">
+                            <div className="h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                              <AlertCircle className="h-8 w-8 text-destructive" />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <h3 className="font-semibold text-lg">Failed to Load Listings</h3>
+                            <p className="text-muted-foreground">
+                              Unable to fetch Listings from this relay. Try switching to another relay or check your connection.
+                            </p>
+                          </div>
+                          <RelaySelector className="w-full" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {listings && listings.length === 0 && isOwnProfile && (
+                    <Card className="border-dashed rounded-none md:rounded-lg">
+                      <CardContent className="py-12 px-8 text-center">
+                        <div className="max-w-sm mx-auto space-y-6">
+                          <div className="flex justify-center">
+                            <div className="h-16 w-16 rounded-full bg-muted/20 flex items-center justify-center">
+                              <Store className="h-8 w-8 text-muted-foreground" />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <h3 className="font-semibold text-lg">No Listings Yet</h3>
+                            <p className="text-muted-foreground">
+                              You haven't published any Listings yet. Submit your first listing to showcase your business!
+                            </p>
+                          </div>
+                          <div className="space-y-3">
+                            <Button asChild>
+                              <Link to="/listings/submit">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Submit Your First Listing
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {hasListings && (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {listings.map((listing) => (
+                        <div key={listing.id} className="relative">
+                          <ListingCard 
+                            listing={listing} 
+                            renderDescription={(text) => text}
+                            onNavigate={(path) => window.location.href = path}
+                          />
+                          {isOwnProfile && (
+                            <div className="absolute top-2 right-2">
+                              <ListingActions listing={listing} />
                             </div>
                           )}
                         </div>

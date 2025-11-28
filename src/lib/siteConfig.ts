@@ -58,6 +58,27 @@ export function isClientSideCurationEnabled(): boolean {
   return import.meta.env.VITE_CLIENT_SIDE_CURATION === 'true';
 }
 
+// Get visible sections based on environment configuration
+export function getVisibleSections(): string[] {
+  const sectionsConfig = import.meta.env.VITE_SECTIONS;
+  
+  if (!sectionsConfig || sectionsConfig.trim() === '') {
+    // Show all sections by default
+    return ['resources', 'nips', 'apps', 'listings', 'repositories', 'dvm'];
+  }
+  
+  return sectionsConfig
+    .split(',')
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+// Check if a specific section is visible
+export function isSectionVisible(sectionId: string): boolean {
+  const visibleSections = getVisibleSections();
+  return visibleSections.includes(sectionId.toLowerCase());
+}
+
 export function getCuratorNpubs(): string[] {
   const npubsString = import.meta.env.VITE_NPUB_CURATORS;
   if (!npubsString || typeof npubsString !== 'string') {
