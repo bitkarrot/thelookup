@@ -22,6 +22,8 @@ A comprehensive Nostr ecosystem explorer and directory for discovering NIPs, app
 - **Rich Listing Details**: Dedicated detail pages with images, description, Nostr event data, and shipping zones
 - **Owner Controls**: Listing owners can edit their stalls and request deletion via NIP-09
 - **Listing Flagging**: Community members can flag listings with NIP-1984 reports (fraud, spam, scam, duplicate, inappropriate, impersonation)
+- **Profile Integration**: Each listing displays the author's profile name with direct links to their Nostr profile
+- **Author Pages**: View all listings created by a specific author on their profile page
 
 ### 📖 NIPs (Nostr Implementation Possibilities)
 - **Official NIPs**: Browse and search through official NIPs from the [nostr-protocol/nips](https://github.com/nostr-protocol/nips) repository
@@ -44,13 +46,22 @@ A comprehensive Nostr ecosystem explorer and directory for discovering NIPs, app
 ### 🔧 Developer Tools
 - **DVM Marketplace**: Discover and interact with Data Vending Machines
 - **Event Explorer**: View and analyze Nostr events by kind
-- **Author Profiles**: Explore user profiles and their contributions
+- **Author Profiles**: Explore user profiles and their contributions across all sections
+
+### 👤 Enhanced Profile Pages
+- **Section Configuration**: Configurable sections based on `VITE_SECTIONS` environment variable
+- **Author Listings**: Display business listings created by profile owners
+- **Profile Links**: Direct links to author profiles from listing and app cards
+- **Comprehensive Views**: Shows Custom NIPs, Apps, Repositories, and Listings based on configuration
+- **Owner Controls**: Edit and delete actions for profile owners on their own content
 
 ### 🎨 Modern UI/UX
 - **Beautiful Themes**: Support for tweakcn.com themes with OKLCH color spaces
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Dark/Light Mode**: Automatic theme switching with system preference detection
 - **Smooth Animations**: Polished interactions and transitions
+- **Optimized Images**: Circular avatars with proper cropping using object-fit for professional appearance
+- **Profile Integration**: Seamless profile links throughout listings and app cards
 
 ## URL Structure
 
@@ -143,6 +154,9 @@ The site can be customized by setting environment variables. Copy `.env.example`
 VITE_SITE_NAME=lookup-client           # Client tag for filtering listings (optional)
 VITE_SITE_URL=https://thelookup.app    # Full site URL
 VITE_SITE_DISPLAY_NAME=TheLookup       # Display name shown in UI
+
+# Navigation Configuration
+VITE_SECTIONS=listings,apps,nips       # Comma-separated list of visible sections (optional)
 ```
 
 ### Deployment Customization
@@ -194,6 +208,44 @@ VITE_SITE_NAME=my-business-directory
 - Filtering happens at the data layer for optimal performance
 - Other instances can use the same relay with different client tags
 - Backward compatible with existing deployments
+
+### Section Configuration
+
+Control which sections appear in the navigation and profile pages using the `VITE_SECTIONS` environment variable:
+
+#### Available Sections
+- `resources` - Nostr resources and tools hub
+- `nips` - NIPs browser and custom NIPs
+- `apps` - Application directory
+- `listings` - Business listings directory
+- `repositories` - Git repository explorer
+- `dvm` - Data Vending Machine marketplace
+
+#### Configuration Examples
+
+**Show all sections (default):**
+```bash
+# Don't set VITE_SECTIONS or leave it empty
+# VITE_SECTIONS=
+```
+
+**Show only specific sections:**
+```bash
+VITE_SECTIONS=listings,apps
+# Only shows listings and apps in navigation and profile pages
+```
+
+**Business-focused directory:**
+```bash
+VITE_SECTIONS=listings,resources
+# Perfect for business directories with supporting resources
+```
+
+#### Profile Page Integration
+- Profile pages automatically respect the section configuration
+- Only configured sections will display author content
+- Maintains consistent user experience across navigation and profiles
+- Authors can only see edit/delete controls for visible sections
 
 ## Development
 
