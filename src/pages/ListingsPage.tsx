@@ -3,13 +3,14 @@ import { useState, useMemo } from 'react';
 import { Layout } from '@/components/Layout';
 import { useListings } from '@/hooks/useListings';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { ListingCard } from '@/components/ListingCard';
+import { ListingListItem } from '@/components/ListingListItem';
 import { RelaySelector } from '@/components/RelaySelector';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Search, Store, Plus, Grid3x3, List, ExternalLink } from 'lucide-react';
+import { Search, Store, Plus, Grid3x3, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { getPageTitle, getPageDescription } from '@/lib/siteConfig';
@@ -220,147 +221,24 @@ export default function ListingsPage() {
                 {viewMode === 'cards' ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mt-6">
                     {filteredListings.map((listing) => (
-                      <Link
+                      <ListingCard
                         key={listing.id}
-                        to={`/listings/${encodeURIComponent(listing.stallId)}`}
-                        className="block hover:no-underline"
-                      >
-                        <Card className="h-full flex flex-col sm:rounded-lg rounded-none hover:border-primary/50 transition-colors">
-                          <CardHeader>
-                            <div className="flex items-center gap-3">
-                              <Avatar className="h-10 w-10">
-                                {listing.image && (
-                                  <AvatarImage src={listing.image} alt={listing.name} />
-                                )}
-                                <AvatarFallback>
-                                  {listing.name.slice(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                              <CardTitle className="text-lg truncate">{listing.name}</CardTitle>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-2">
-                            {listing.description && (
-                              <p className="text-sm text-muted-foreground line-clamp-3">
-                                {renderDescription(listing.description, false)}
-                              </p>
-                            )}
-                            {listing.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {listing.tags.slice(0, 4).map((tag) => (
-                                  <Badge key={tag} variant="outline" className="text-xs">
-                                    {tag}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                            <div className="pt-3 flex flex-wrap gap-2">
-                              {listing.website && (
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  className="h-8 px-3 text-xs sm:text-sm bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    window.open(listing.website as string, '_blank', 'noopener,noreferrer');
-                                  }}
-                                >
-                                  <ExternalLink className="h-4 w-4 mr-1" />
-                                  Open
-                                </Button>
-                              )}
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="h-8 px-3 text-xs sm:text-sm"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  navigate(`/listings/${encodeURIComponent(listing.stallId)}`);
-                                }}
-                              >
-                                Details
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Link>
+                        listing={listing}
+                        renderDescription={renderDescription}
+                        onNavigate={navigate}
+                      />
                     ))}
                   </div>
                 ) : (
                   <Card className="sm:rounded-lg rounded-none mt-6">
                     <div className="divide-y">
                       {filteredListings.map((listing) => (
-                        <Link
+                        <ListingListItem
                           key={listing.id}
-                          to={`/listings/${encodeURIComponent(listing.stallId)}`}
-                          className="block hover:bg-accent/60 transition-colors"
-                        >
-                          <div className="p-4 flex flex-col gap-2">
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-2 min-w-0">
-                                <Avatar className="h-8 w-8 flex-shrink-0">
-                                  {listing.image && (
-                                    <AvatarImage src={listing.image} alt={listing.name} />
-                                  )}
-                                  <AvatarFallback className="text-xs">
-                                    {listing.name.slice(0, 2).toUpperCase()}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {listing.website && (
-                                  <Button
-                                    type="button"
-                                    size="sm"
-                                    className="h-8 px-3 text-[10px] sm:text-xs bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      window.open(listing.website as string, '_blank', 'noopener,noreferrer');
-                                    }}
-                                  >
-                                    <ExternalLink className="h-3 w-3 mr-1" />
-                                    Open
-                                  </Button>
-                                )}
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-8 px-3 text-[10px] sm:text-xs"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    navigate(`/listings/${encodeURIComponent(listing.stallId)}`);
-                                  }}
-                                >
-                                  Details
-                                </Button>
-                              </div>
-                            </div>
-                          {listing.description && (
-                            <p className="text-sm text-muted-foreground line-clamp-2">
-                              {renderDescription(listing.description, false)}
-                            </p>
-                          )}
-                          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                            <span>{listing.currency || 'Currency not specified'}</span>
-                            {listing.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1">
-                                {listing.tags.slice(0, 3).map((tag) => (
-                                  <Badge key={tag} variant="outline" className="text-xs">
-                                    {tag}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          </div>
-                        </Link>
+                          listing={listing}
+                          renderDescription={renderDescription}
+                          onNavigate={navigate}
+                        />
                       ))}
                     </div>
                   </Card>
