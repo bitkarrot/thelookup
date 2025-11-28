@@ -36,6 +36,10 @@ vi.mock('@/hooks/useRepositories', () => ({
   useRepositoriesByAuthor: vi.fn(),
 }));
 
+vi.mock('@/hooks/useListingsByAuthor', () => ({
+  useListingsByAuthor: vi.fn(),
+}));
+
 describe('AuthorPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -51,6 +55,7 @@ describe('AuthorPage', () => {
     const { useAuthor } = await import('@/hooks/useAuthor');
     const { useCustomNipsByAuthor } = await import('@/hooks/useCustomNipsByAuthor');
     const { useRepositoriesByAuthor } = await import('@/hooks/useRepositories');
+    const { useListingsByAuthor } = await import('@/hooks/useListingsByAuthor');
     
     // Mock loading state
     vi.mocked(useAppsByAuthor).mockReturnValue({
@@ -86,6 +91,13 @@ describe('AuthorPage', () => {
       error: null,
     } as never);
 
+    // Mock listings data
+    vi.mocked(useListingsByAuthor).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as never);
+
     render(
       <TestApp>
         <AuthorPage />
@@ -109,6 +121,7 @@ describe('AuthorPage', () => {
     const { useAuthor } = await import('@/hooks/useAuthor');
     const { useCustomNipsByAuthor } = await import('@/hooks/useCustomNipsByAuthor');
     const { useRepositoriesByAuthor } = await import('@/hooks/useRepositories');
+    const { useListingsByAuthor } = await import('@/hooks/useListingsByAuthor');
     
     // Mock empty apps data (not loading, no error)
     vi.mocked(useAppsByAuthor).mockReturnValue({
@@ -144,6 +157,13 @@ describe('AuthorPage', () => {
       error: null,
     } as never);
 
+    // Mock listings data
+    vi.mocked(useListingsByAuthor).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as never);
+
     render(
       <TestApp>
         <AuthorPage />
@@ -168,6 +188,7 @@ describe('AuthorPage', () => {
     const { useAuthor } = await import('@/hooks/useAuthor');
     const { useCustomNipsByAuthor } = await import('@/hooks/useCustomNipsByAuthor');
     const { useRepositoriesByAuthor } = await import('@/hooks/useRepositories');
+    const { useListingsByAuthor } = await import('@/hooks/useListingsByAuthor');
     
     // Mock empty apps data (not loading, no error)
     vi.mocked(useAppsByAuthor).mockReturnValue({
@@ -207,6 +228,13 @@ describe('AuthorPage', () => {
       error: null,
     } as never);
 
+    // Mock listings data
+    vi.mocked(useListingsByAuthor).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as never);
+
     render(
       <TestApp>
         <AuthorPage />
@@ -230,6 +258,7 @@ describe('AuthorPage', () => {
     const { useAuthor } = await import('@/hooks/useAuthor');
     const { useCustomNipsByAuthor } = await import('@/hooks/useCustomNipsByAuthor');
     const { useRepositoriesByAuthor } = await import('@/hooks/useRepositories');
+    const { useListingsByAuthor } = await import('@/hooks/useListingsByAuthor');
     
     // Mock empty apps data (not loading, no error)
     vi.mocked(useAppsByAuthor).mockReturnValue({
@@ -265,6 +294,13 @@ describe('AuthorPage', () => {
       error: null,
     } as never);
 
+    // Mock empty listings data (not loading, no error)
+    vi.mocked(useListingsByAuthor).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as never);
+
     render(
       <TestApp>
         <AuthorPage />
@@ -274,7 +310,7 @@ describe('AuthorPage', () => {
     // Check that the combined empty state is shown
     await waitFor(() => {
       expect(screen.getByText('No Content Found')).toBeInTheDocument();
-      expect(screen.getByText(/This author hasn't published any Custom NIPs, Apps, or Repositories on this relay/)).toBeInTheDocument();
+      expect(screen.getByText(/This author hasn't published any content on this relay/)).toBeInTheDocument();
     });
 
     // Check that individual section headings are NOT present
